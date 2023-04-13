@@ -7,13 +7,19 @@ async function main() {
 
   const location1 = await prisma.location.create({
     data: {
-      name: "5 Avenue Anatole France, 75007 Paris",
+      address: "5 Avenue Anatole France",
+      zipCode: "75007",
+      city: "Paris",
+      country: "France",
     },
   });
 
   const location2 = await prisma.location.create({
     data: {
-      name: "Place d'Armes, 78000 Versailles",
+      address: "Place d'Armes",
+      zipCode: "78000",
+      city: "Versailles",
+      country: "France",
     },
   });
 

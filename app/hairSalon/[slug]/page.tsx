@@ -45,15 +45,15 @@ export default async function BarberDetails({
 }: {
   params: { slug: string };
 }) {
-  const hairSalon = fetchHairSalonBySlug(params.slug);
+  const hairSalon = await fetchHairSalonBySlug(params.slug);
   return (
     <>
       <div className="bg-white w-[70%] rounded p-3 shadow">
-        <BarberNavbar />
-        <Title />
+        <BarberNavbar slug={hairSalon.slug} />
+        <Title name={hairSalon.name} />
         <Rating />
-        <Description />
-        <Images />
+        <Description description={hairSalon.description} />
+        <Images images={hairSalon.images} />
         <Reviews />
       </div>
       <div className="w-[27%] relative text-reg">
