@@ -31,7 +31,6 @@ const fetchHairSalons = async (): Promise<HairSalonCardType[]> => {
 export default async function Home() {
   const hairSalons = await fetchHairSalons();
 
-  console.log(hairSalons);
   return (
     <main>
       <Header /> {/* CARDS */}
