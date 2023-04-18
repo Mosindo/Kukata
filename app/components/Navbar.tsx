@@ -4,7 +4,10 @@ import React from "react";
 const Navbar = () => {
   return (
     <nav className="bg-white p-2 flex justify-between">
-      <Link href="/" className="font-bold text-gray-700 text-2xl">
+      <Link
+        href="/"
+        className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#11998e]  to-[#38ef7d] text-2xl"
+      >
         Kukata
       </Link>
       <div>
