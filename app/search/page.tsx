@@ -56,6 +56,7 @@ const searchSalons = (searchParams: SearchParams) => {
     priceRange: true,
     location: true,
     slug: true,
+    reviews: true,
   };
 
   return prisma.hairSalon.findMany({

@@ -5,7 +5,7 @@ import Description from "./components/Description";
 import Images from "./components/Images";
 import Reviews from "./components/Reviews";
 import ReservationCard from "./components/ReservationCard";
-import { PRICERANGE, PrismaClient, Location } from "@prisma/client";
+import { PRICERANGE, PrismaClient, Location, Review } from "@prisma/client";
 
 const prisma = new PrismaClient();
 interface HairSalonType {
@@ -17,6 +17,7 @@ interface HairSalonType {
   slug: string;
   priceRange: PRICERANGE;
   location: Location;
+  reviews: Review[];
 }
 const fetchHairSalonBySlug = async (slug: string): Promise<HairSalonType> => {
   const hairSalon = await prisma.hairSalon.findUnique({
@@ -32,6 +33,7 @@ const fetchHairSalonBySlug = async (slug: string): Promise<HairSalonType> => {
       images: true,
       slug: true,
       priceRange: true,
+      reviews: true,
     },
   });
 
@@ -51,10 +53,10 @@ export default async function BarberDetails({
       <div className="bg-white w-[70%] rounded p-3 shadow">
         <BarberNavbar slug={hairSalon.slug} />
         <Title name={hairSalon.name} />
-        <Rating />
+        <Rating reviews={hairSalon.reviews} />
         <Description description={hairSalon.description} />
         <Images images={hairSalon.images} />
-        <Reviews />
+        <Reviews reviews={hairSalon.reviews} />
       </div>
       <div className="w-[27%] relative text-reg">
         <ReservationCard />

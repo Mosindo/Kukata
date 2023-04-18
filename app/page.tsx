@@ -1,6 +1,6 @@
 import Header from "./components/Header";
 import BarberCard from "./components/BarberCard";
-import { PrismaClient, Location, PRICERANGE } from "@prisma/client";
+import { PrismaClient, Location, PRICERANGE, Review } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -12,6 +12,7 @@ export interface HairSalonCardType {
   mainImage: string;
   priceRange: PRICERANGE;
   slug: string;
+  reviews: Review[];
 }
 
 const fetchHairSalons = async (): Promise<HairSalonCardType[]> => {
@@ -24,6 +25,7 @@ const fetchHairSalons = async (): Promise<HairSalonCardType[]> => {
       mainImage: true,
       slug: true,
       priceRange: true,
+      reviews: true,
     },
   });
   return hairSalons;

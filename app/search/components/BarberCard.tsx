@@ -1,8 +1,9 @@
-import { PRICERANGE, Location } from "@prisma/client";
+import { PRICERANGE, Location, Review } from "@prisma/client";
 import Link from "next/link";
 import React from "react";
 import Price from "../../components/Price";
-import Image from "next/image";
+import { calculateReviewRatingAverage } from "../../../utils/calculateReviewRateAverage";
+import Stars from "../../components/Stars";
 
 interface BarberCardProps {
   slug: string;
@@ -11,16 +12,25 @@ interface BarberCardProps {
   location: Location;
   mainImage: string;
   priceRange: PRICERANGE;
+  reviews: Review[];
 }
 const BarberCard = ({ hairSalon }: { hairSalon: BarberCardProps }) => {
+  const renderRatingText = () => {
+    const rating = calculateReviewRatingAverage(hairSalon.reviews) as number;
+
+    if (rating > 4) return "Awesome";
+    else if (rating <= 4 && rating > 3) return "Good";
+    else if (rating <= 3 && rating > 0) return "Average";
+    else "";
+  };
   return (
     <div className="border-b flex pb-5 ml-4">
       <img src={hairSalon.mainImage} alt="" className="w-44 h-36 rounded" />
       <div className="pl-5">
         <h2 className="text-3xl">{hairSalon.name}</h2>
         <div className="flex items-start">
-          <div className="flex mb-2">*****</div>
-          <p className="ml-2 text-sm">Awesome</p>
+          <Stars reviews={hairSalon.reviews} />
+          <p className="ml-2 text-sm">{renderRatingText()}</p>
         </div>
         <div className="mb-9">
           <div className="font-light flex text-reg">

@@ -1,8 +1,20 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { PrismaClient, PRICERANGE } from "@prisma/client";
+import { NextApiRequest, NextApiResponse } from "next";
 const prisma = new PrismaClient();
+type Data = {
+  name: string;
+};
 
-async function main() {
+async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+  await prisma.review.deleteMany();
+  await prisma.appointment.deleteMany();
+  await prisma.customer.deleteMany();
+  await prisma.stylist.deleteMany();
+  await prisma.service.deleteMany();
+  await prisma.hairSalon.deleteMany();
+  await prisma.location.deleteMany();
+
   const imageUrl = "https://images.otstatic.com/prod1/49153814/2/medium.jpg";
 
   const location1 = await prisma.location.create({
@@ -122,13 +134,83 @@ async function main() {
       serviceId: service1.id,
     },
   });
+
+  const review1 = await prisma.review.create({
+    data: {
+      rating: 4.5,
+      comment:
+        "Super expérience, le personnel est très professionnel et sympathique.",
+      hairSalonId: salon1.id,
+      customerId: customer1.id,
+    },
+  });
+
+  const review2 = await prisma.review.create({
+    data: {
+      rating: 5.0,
+      comment:
+        "Meilleur salon de coiffure que j'ai visité jusqu'à présent. Hautement recommandé !",
+      hairSalonId: salon1.id,
+      customerId: customer1.id,
+    },
+  });
+
+  const review3 = await prisma.review.create({
+    data: {
+      rating: 3.0,
+      comment: "Service correct, mais l'attente était un peu longue.",
+      hairSalonId: salon1.id,
+      customerId: customer1.id,
+    },
+  });
+
+  const review4 = await prisma.review.create({
+    data: {
+      rating: 4.0,
+      comment: "J'aime mon nouveau look ! Merci beaucoup !",
+      hairSalonId: salon1.id,
+      customerId: customer1.id,
+    },
+  });
+
+  const review5 = await prisma.review.create({
+    data: {
+      rating: 2.5,
+      comment: "La coupe était bien, mais le salon n'était pas très propre.",
+      hairSalonId: salon2.id,
+      customerId: customer1.id,
+    },
+  });
+
+  const review6 = await prisma.review.create({
+    data: {
+      rating: 4.5,
+      comment:
+        "Un service exceptionnel et un excellent résultat pour ma coloration.",
+      hairSalonId: salon2.id,
+      customerId: customer1.id,
+    },
+  });
+
+  const review7 = await prisma.review.create({
+    data: {
+      rating: 5.0,
+      comment: "Le personnel est très compétent et le salon est magnifique.",
+      hairSalonId: salon2.id,
+      customerId: customer1.id,
+    },
+  });
+
+  const review8 = await prisma.review.create({
+    data: {
+      rating: 3.5,
+      comment: "Un peu cher, mais la qualité du service est au rendez-vous.",
+      hairSalonId: salon2.id,
+      customerId: customer1.id,
+    },
+  });
+
+  res.status(200).json({ name: "seed done" });
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+export default handler;

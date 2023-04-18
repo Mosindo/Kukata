@@ -1,8 +1,9 @@
 import Link from "next/link";
 import React from "react";
-import Image from "next/image";
 import { HairSalonCardType } from "../page";
 import Price from "./Price";
+import Stars from "./Stars";
+import Reviews from "../hairSalon/[slug]/components/Reviews";
 
 interface HairSalon {
   hairSalon: HairSalonCardType;
@@ -22,8 +23,11 @@ const BarberCard = ({ hairSalon }: HairSalon) => {
         <div className="p-1">
           <h3 className="font-bold text-2xl mb-2">{hairSalon.name}</h3>
           <div className="flex items-start">
-            <div className="flex mb-2">*****</div>
-            <p className="ml-2">77 reviews</p>
+            <Stars reviews={hairSalon.reviews} />
+            <p className="ml-2">
+              {hairSalon.reviews.length} review
+              {hairSalon.reviews.length === 1 ? "" : "s"}
+            </p>
           </div>
           <div className="flex text-reg font-light capitalize">
             <Price price={hairSalon.priceRange} />
