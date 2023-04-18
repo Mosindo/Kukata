@@ -15,7 +15,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
   await prisma.hairSalon.deleteMany();
   await prisma.location.deleteMany();
 
-  const imageUrl = "https://images.otstatic.com/prod1/49153814/2/medium.jpg";
+  const imageUrl =
+    "https://images.unsplash.com/photo-1512864084360-7c0c4d0a0845?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80";
 
   const location1 = await prisma.location.create({
     data: {
