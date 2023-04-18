@@ -3,7 +3,7 @@ import SearchBar from "../../components/SearchBar";
 
 const Header = () => {
   return (
-    <div className="bg-gradient-to-r to-[#5f6984] from-[#0f1f47] p-2">
+    <div className="bg-gradient-to-r from-[#2ecc71] via-[#a9df85] to-[#f39c12] p-2p-2">
       <SearchBar />
     </div>
   );
