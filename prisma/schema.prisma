@@ -23,15 +23,15 @@ model HairSalon {
   slug        String     @unique
   priceRange  PRICERANGE
   services    Service[]
-  firstName    String
-  lastName     String
+  firstName   String
+  lastName    String
   email       String     @unique
   password    String
   locationId  Int
   location    Location   @relation(fields: [locationId], references: [id])
   phoneNumber String?
   stylists    Stylist[]
-  reviews   Review[]
+  reviews     Review[]
 }
 
 model Service {
@@ -74,13 +74,13 @@ model Customer {
   firstName    String
   lastName     String
   phoneNumber  String
-  email        String      @unique
+  email        String        @unique
   password     String
   appointments Appointment[]
-  city          String?
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime?    @updatedAt
-  reviews   Review[]
+  city         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime?     @updatedAt
+  reviews      Review[]
 }
 
 model Stylist {
@@ -98,15 +98,15 @@ model Stylist {
 }
 
 model Review {
-  id        Int      @id @default(autoincrement())
-  hairSalon HairSalon @relation(fields: [hairSalonId], references: [id])
+  id          Int       @id @default(autoincrement())
+  hairSalon   HairSalon @relation(fields: [hairSalonId], references: [id])
   hairSalonId Int
-  customer  Customer @relation(fields: [customerId], references: [id])
-  customerId Int
-  rating    Float
-  comment   String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  customer    Customer  @relation(fields: [customerId], references: [id])
+  customerId  Int
+  rating      Float
+  comment     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 enum PRICERANGE {
@@ -114,4 +114,3 @@ enum PRICERANGE {
   MEDIUM
   CHEAP
 }
-
