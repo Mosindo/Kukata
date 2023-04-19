@@ -5,9 +5,10 @@ import Description from "./components/Description";
 import Images from "./components/Images";
 import Reviews from "./components/Reviews";
 import ReservationCard from "./components/ReservationCard";
-import { PRICERANGE, PrismaClient, Location, Review } from "@prisma/client";
+import { PRICERANGE, Location, Review } from "@prisma/client";
+import { notFound } from "next/navigation";
+import prisma from "../../../utils/prisma";
 
-const prisma = new PrismaClient();
 interface HairSalonType {
   name: string;
   id: number;
@@ -37,7 +38,9 @@ const fetchHairSalonBySlug = async (slug: string): Promise<HairSalonType> => {
     },
   });
 
-  if (!hairSalon) throw new Error("No hair salon found with that slug");
+  if (!hairSalon) {
+    notFound();
+  }
 
   return hairSalon;
 };

@@ -23,6 +23,10 @@ model HairSalon {
   slug        String     @unique
   priceRange  PRICERANGE
   services    Service[]
+  firstName    String
+  lastName     String
+  email       String     @unique
+  password    String
   locationId  Int
   location    Location   @relation(fields: [locationId], references: [id])
   phoneNumber String?
@@ -71,6 +75,7 @@ model Customer {
   lastName     String
   phoneNumber  String
   email        String      @unique
+  password     String
   appointments Appointment[]
   city          String?
   createdAt  DateTime    @default(now())
@@ -84,6 +89,7 @@ model Stylist {
   lastName     String
   phoneNumber  String?
   email        String?       @unique
+  password     String?
   images       String[]
   mainImage    String
   hairSalonId  Int

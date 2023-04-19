@@ -3,7 +3,6 @@ import React from "react";
 import { HairSalonCardType } from "../page";
 import Price from "./Price";
 import Stars from "./Stars";
-import Reviews from "../hairSalon/[slug]/components/Reviews";
 
 interface HairSalon {
   hairSalon: HairSalonCardType;

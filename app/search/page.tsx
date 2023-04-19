@@ -2,8 +2,8 @@ import { PRICERANGE, PrismaClient } from "@prisma/client";
 import BarberCard from "./components/BarberCard";
 import Header from "./components/Header";
 import SearchSideBar from "./components/SearchSideBar";
+import prisma from "../../utils/prisma";
 
-const prisma = new PrismaClient();
 export interface SearchParams {
   searchTerm?: string;
   price?: PRICERANGE;
