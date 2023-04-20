@@ -10,6 +10,7 @@ interface AuthModalInputsProps {
     password: string;
   };
 
+  // eslint-disable-next-line no-unused-vars
   handleChangeInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isSignin: boolean;
 }

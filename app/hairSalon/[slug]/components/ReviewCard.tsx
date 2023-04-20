@@ -1,7 +1,6 @@
-import { PrismaClient, Review } from "@prisma/client";
+import { Review } from "@prisma/client";
 import Stars from "../../../components/Stars";
-
-const prisma = new PrismaClient();
+import prisma from "../../../../utils/prisma";
 
 interface CustomerType {
   id: number;

@@ -27,7 +27,7 @@ model HairSalon {
   lastName    String
   email       String     @unique
   password    String
-  locationId  Int
+  locationId  Int        @unique
   location    Location   @relation(fields: [locationId], references: [id])
   phoneNumber String?
   stylists    Stylist[]
@@ -48,14 +48,14 @@ model Service {
 }
 
 model Location {
-  id         Int         @id @default(autoincrement())
-  city       String
-  country    String
-  address    String
-  zipCode    String
-  hairSalons HairSalon[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id        Int        @id @default(autoincrement())
+  city      String
+  country   String
+  address   String
+  zipCode   String
+  hairSalon HairSalon?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model Appointment {
