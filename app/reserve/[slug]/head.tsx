@@ -1,4 +1,4 @@
-export default function Head() {
+const Head = () => {
   return (
     <>
       <title>Reserve at Bobo barber | Kukata </title>
@@ -7,4 +7,6 @@ export default function Head() {
       <link rel="icon" href="/favicon.ico" />
     </>
   );
-}
+};
+
+export default Head;

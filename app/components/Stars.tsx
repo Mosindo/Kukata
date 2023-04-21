@@ -6,13 +6,7 @@ import Image from "next/image";
 import { Review } from "@prisma/client";
 import { calculateReviewRatingAverage } from "../../utils/calculateReviewRateAverage";
 
-export default function Stars({
-  reviews,
-  rating,
-}: {
-  reviews: Review[];
-  rating?: number;
-}) {
+const Stars = ({ reviews, rating }: { reviews: Review[]; rating?: number }) => {
   const calculatedRating = calculateReviewRatingAverage(reviews);
   const reviewRating =
     rating ||
@@ -39,4 +33,6 @@ export default function Stars({
   };
 
   return <div className="flex items-center">{renderStars()}</div>;
-}
+};
+
+export default Stars;

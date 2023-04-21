@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as jose from "jose";
-import jwt from "jsonwebtoken";
 
 export async function middleware(req: NextRequest, res: NextResponse) {
   const bearerToken = req.headers.get("authorization") as string;

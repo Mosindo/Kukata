@@ -80,6 +80,13 @@ export default async function handler(
       .sign(secret);
 
     setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
+    return res.status(200).json({
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      email: customer.email,
+      phone: customer.phoneNumber,
+      city: customer.city,
+    });
   }
   return res.status(404).json("Unknown endpoint");
 }

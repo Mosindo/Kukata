@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import * as jose from "jose";
 import { setCookie } from "cookies-next";
-
-const prisma = new PrismaClient();
+import prisma from "../../../utils/prisma";
 
 export default async function handler(
   req: NextApiRequest,

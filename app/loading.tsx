@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "./components/Header";
 
-export default function Loading() {
+const Loading = () => {
   return (
     <main>
       <Header />
@@ -15,4 +15,6 @@ export default function Loading() {
       </div>
     </main>
   );
-}
+};
+
+export default Loading;

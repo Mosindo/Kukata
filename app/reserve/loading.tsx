@@ -1,4 +1,4 @@
-export default function loading() {
+const loading = () => {
   return (
     <>
       <div className="border-t h-screen">
@@ -61,4 +61,6 @@ export default function loading() {
       </div>
     </>
   );
-}
+};
+
+export default loading;

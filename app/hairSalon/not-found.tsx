@@ -1,7 +1,7 @@
 import Image from "next/image";
 import errorMascot from "../../public/icons/error.png";
 
-export default function Error({ error }: { error: Error }) {
+const Error = ({ error }: { error: Error }) => {
   console.log(error);
   return (
     <div className="h-screen bg-gray-200 flex flex-col justify-center items-center">
@@ -13,4 +13,6 @@ export default function Error({ error }: { error: Error }) {
       </div>
     </div>
   );
-}
+};
+
+export default Error;
