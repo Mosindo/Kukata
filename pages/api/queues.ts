@@ -18,8 +18,14 @@ export default async function handler(
   switch (method) {
     case "GET":
       try {
-        const queues = await getAllQueues();
-        res.status(200).json(queues);
+        if (req.query.id) {
+          const queue = await getQueueById(Number(req.query.id));
+          res.status(200).json(queue);
+        } else {
+          const queues = await getAllQueues();
+          res.status(200).json(queues);
+        }
+        break;
       } catch (error) {
         res.status(500).json({ errorMessage: "Failed to get queues" });
       }
