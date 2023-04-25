@@ -4,7 +4,9 @@ import { useContext } from "react";
 import { AuthenticationContext } from "../app/context/AuthContext";
 
 const useAuth = () => {
-  const { setAuthState } = useContext(AuthenticationContext);
+  const { data, error, loading, setAuthState } = useContext(
+    AuthenticationContext
+  );
 
   const signin = async (
     {
@@ -29,6 +31,7 @@ const useAuth = () => {
           password,
         }
       );
+
       setAuthState({
         data: response.data,
         error: null,
@@ -50,14 +53,14 @@ const useAuth = () => {
       firstName,
       lastName,
       city,
-      phone,
+      phoneNumber,
     }: {
       email: string;
       password: string;
       firstName: string;
       lastName: string;
       city: string;
-      phone: string;
+      phoneNumber: string;
     },
     handleClose: () => void
   ) => {
@@ -75,7 +78,7 @@ const useAuth = () => {
           firstName,
           lastName,
           city,
-          phone,
+          phoneNumber,
         }
       );
       setAuthState({

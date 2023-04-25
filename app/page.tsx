@@ -1,7 +1,7 @@
 import Header from "./components/Header";
 import BarberCard from "./components/BarberCard";
 import { Location, PRICERANGE, Review } from "@prisma/client";
-import prisma from "../utils/prisma";
+import prisma from "../lib/prisma";
 
 export interface HairSalonCardType {
   id: number;

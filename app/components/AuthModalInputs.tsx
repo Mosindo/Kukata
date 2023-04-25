@@ -60,7 +60,7 @@ const AuthModalInputs = ({
             placeholder="Phone"
             value={inputs.phoneNumber}
             onChange={handleChangeInput}
-            name="phone"
+            name="phoneNumber"
           />
           <input
             type="text"

@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import BarberNavbar from "../components/BarberNavbar";
 import Services from "../components/Services";
-import prisma from "../../../../utils/prisma";
+import prisma from "../../../../lib/prisma";
 
 const fetchHairSalonBySlug = async (slug: string) => {
   const hairSalon = await prisma.hairSalon.findUnique({

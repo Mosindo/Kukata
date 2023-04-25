@@ -2,7 +2,7 @@ import { PRICERANGE, PrismaClient } from "@prisma/client";
 import BarberCard from "./components/BarberCard";
 import Header from "./components/Header";
 import SearchSideBar from "./components/SearchSideBar";
-import prisma from "../../utils/prisma";
+import prisma from "../../lib/prisma";
 
 export interface SearchParams {
   searchTerm?: string;

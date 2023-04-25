@@ -1,11 +1,26 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { PRICERANGE } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
-import prisma from "../../utils/prisma";
+import prisma from "../../lib/prisma";
+import { supabase } from "../../lib/supabase";
 
 type Data = {
   name: string;
 };
+
+async function createSupabaseUser(email: string, password: string) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (error) {
+    console.error("Error creating Supabase user:", error);
+    throw error;
+  }
+
+  return data?.user?.id;
+}
 
 async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
   await prisma.review.deleteMany();
@@ -13,8 +28,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
   await prisma.service.deleteMany();
   await prisma.stylist.deleteMany();
   await prisma.customer.deleteMany();
-  await prisma.location.deleteMany();
   await prisma.hairSalon.deleteMany();
+  await prisma.location.deleteMany();
 
   const imageUrl =
     "https://images.unsplash.com/photo-1512864084360-7c0c4d0a0845?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80";
@@ -57,7 +72,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       firstName: "Alice",
       lastName: "Smith",
       email: "alice@example.com",
-      password: "password123",
       phoneNumber: "0123456789",
       locationId: 1,
     },
@@ -73,7 +87,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       firstName: "Bob",
       lastName: "Johnson",
       email: "bob@example.com",
-      password: "password123",
       phoneNumber: "0123456789",
       locationId: 2,
     },
@@ -89,14 +102,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       firstName: "Carol",
       lastName: "Williams",
       email: "carol@example.com",
-      password: "password123",
       phoneNumber: "0123456789",
       locationId: 3,
     },
   ];
 
   for (const salonData of salons) {
-    const salon = await prisma.hairSalon.create({ data: salonData });
+    const userId = await createSupabaseUser(salonData.email, "password123!M");
+    const salon = await prisma.hairSalon.create({
+      data: { ...salonData, userId },
+    });
 
     // Create services
     const servicesData = [
@@ -125,7 +140,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
         lastName: "Smith",
         phoneNumber: "0123456789",
         email: `stylista@example.com`,
-        password: "password123",
         images: [
           "https://example.com/stylist-a1.jpg",
           "https://example.com/stylist-a2.jpg",
@@ -138,7 +152,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
         lastName: "Johnson",
         phoneNumber: "0123456789",
         email: `stylistb@example.com`,
-        password: "password123",
         images: [
           "https://example.com/stylist-b1.jpg",
           "https://example.com/stylist-b2.jpg",
@@ -148,7 +161,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       },
     ];
 
-    await prisma.stylist.createMany({ data: stylistsData });
+    for (const stylistData of stylistsData) {
+      const userId = await createSupabaseUser(
+        stylistData.email,
+        "password123!M"
+      );
+      await prisma.stylist.create({ data: { ...stylistData, userId } });
+    }
 
     // Create customers
     const customersData = [
@@ -157,7 +176,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
         lastName: "Williams",
         phoneNumber: "0123456789",
         email: "customerawilliams@example.com",
-        password: "password123",
         city: "Paris",
       },
       {
@@ -165,7 +183,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
         lastName: "Brown",
         phoneNumber: "0123456789",
         email: "customerbbrown@example.com",
-        password: "password123",
         city: "Lyon",
       },
       {
@@ -173,12 +190,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
         lastName: "Moore",
         phoneNumber: "0123456789",
         email: "customercmoore@example.com",
-        password: "password123",
         city: "Marseille",
       },
     ];
 
-    await prisma.customer.createMany({ data: customersData });
+    for (const customerData of customersData) {
+      const userId = await createSupabaseUser(
+        customerData.email,
+        "password123!M"
+      );
+      await prisma.customer.create({ data: { ...customerData, userId } });
+    }
 
     // Create reviews
     const reviewData = [

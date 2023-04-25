@@ -26,12 +26,13 @@ model HairSalon {
   firstName   String
   lastName    String
   email       String     @unique
-  password    String
+  userId      String?
   locationId  Int        @unique
   location    Location   @relation(fields: [locationId], references: [id])
   phoneNumber String?
   stylists    Stylist[]
   reviews     Review[]
+  queues       Queue[]
 }
 
 model Service {
@@ -75,12 +76,13 @@ model Customer {
   lastName     String
   phoneNumber  String
   email        String        @unique
-  password     String
+  userId       String? 
   appointments Appointment[]
   city         String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime?     @updatedAt
   reviews      Review[]
+  queues       Queue[]
 }
 
 model Stylist {
@@ -89,12 +91,13 @@ model Stylist {
   lastName     String
   phoneNumber  String?
   email        String?       @unique
-  password     String?
+  userId       String?
   images       String[]
   mainImage    String
   hairSalonId  Int
   hairSalon    HairSalon     @relation(fields: [hairSalonId], references: [id])
   appointments Appointment[]
+  queues       Queue[]
 }
 
 model Review {
@@ -109,8 +112,28 @@ model Review {
   updatedAt   DateTime  @updatedAt
 }
 
+model Queue {
+  id           Int      @id @default(autoincrement())
+  hairSalonId  Int
+  hairSalon    HairSalon @relation(fields: [hairSalonId], references: [id])
+  customerId   Int
+  customer     Customer  @relation(fields: [customerId], references: [id])
+  stylistId    Int
+  stylist      Stylist   @relation(fields: [stylistId], references: [id])
+  position     Int
+  status       QUEUESTATUS
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
 enum PRICERANGE {
   EXPENSIVE
   MEDIUM
   CHEAP
+}
+
+enum QUEUESTATUS {
+  WAITING
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
 }

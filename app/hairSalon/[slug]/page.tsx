@@ -7,7 +7,7 @@ import Reviews from "./components/Reviews";
 import ReservationCard from "./components/ReservationCard";
 import { PRICERANGE, Location, Review } from "@prisma/client";
 import { notFound } from "next/navigation";
-import prisma from "../../../utils/prisma";
+import prisma from "../../../lib/prisma";
 
 interface HairSalonType {
   name: string;

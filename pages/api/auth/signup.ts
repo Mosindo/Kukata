@@ -1,9 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import validator from "validator";
-import prisma from "../../../utils/prisma";
-import bcrypt from "bcrypt";
-import * as jose from "jose";
+import prisma from "../../../lib/prisma";
 import { setCookie } from "cookies-next";
+import { supabase } from "../../../lib/supabase";
 
 export default async function handler(
   req: NextApiRequest,
@@ -59,25 +58,35 @@ export default async function handler(
     if (customerWithSameEmail) {
       return res.status(400).json({ errorMessage: "Email already exists" });
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    if (error) {
+      return res.status(400).json({ errorMessage: error.message });
+    }
+    // const hashedPassword = await bcrypt.hash(password, 10);
 
     const customer = await prisma.customer.create({
       data: {
         firstName,
         lastName,
         email,
-        password: hashedPassword,
         phoneNumber,
         city,
+        userId: data.user?.id,
+        // password: hashedPassword,
       },
     });
-    const alg = "HS256";
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const token = await new jose.SignJWT({ email: customer.email })
-      .setProtectedHeader({ alg })
-      .setExpirationTime("24h")
-      .sign(secret);
+    // const alg = "HS256";
+
+    // const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    // const token = await new jose.SignJWT({ email: customer.email })
+    //   .setProtectedHeader({ alg })
+    //   .setExpirationTime("24h")
+    //   .sign(secret);
+    const token = data.session?.access_token;
 
     setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
     return res.status(200).json({

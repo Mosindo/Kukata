@@ -1,9 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import validator from "validator";
-import bcrypt from "bcrypt";
-import * as jose from "jose";
 import { setCookie } from "cookies-next";
-import prisma from "../../../utils/prisma";
+import prisma from "../../../lib/prisma";
+import { supabase } from "../../../lib/supabase";
 
 export default async function handler(
   req: NextApiRequest,
@@ -48,30 +47,38 @@ export default async function handler(
         .json({ errorMessage: "Email or password is invalid" });
     }
 
-    const isMatch = await bcrypt.compare(password, customer.password);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    if (!isMatch) {
-      return res
-        .status(401)
-        .json({ errorMessage: "Email or password is invalid" });
+    if (error) {
+      return res.status(401).json({ errorMessage: error.message });
     }
+    // const isMatch = await bcrypt.compare(password, customer.password);
 
-    const alg = "HS256";
+    // if (!isMatch) {
+    //   return res
+    //     .status(401)
+    //     .json({ errorMessage: "Email or password is invalid" });
+    // }
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    // const alg = "HS256";
 
-    const token = await new jose.SignJWT({ email: customer.email })
-      .setProtectedHeader({ alg })
-      .setExpirationTime("24h")
-      .sign(secret);
+    // const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
+    // const token = await new jose.SignJWT({ email: customer.email })
+    //   .setProtectedHeader({ alg })
+    //   .setExpirationTime("24h")
+    //   .sign(secret);
+    const token = data.session?.access_token;
     setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
 
     return res.status(200).json({
       firstName: customer.firstName,
       lastName: customer.lastName,
       email: customer.email,
-      phone: customer.phoneNumber,
+      phoneNumber: customer.phoneNumber,
       city: customer.city,
     });
   }

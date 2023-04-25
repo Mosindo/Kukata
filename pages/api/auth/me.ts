@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import * as jose from "jose";
 import jwt from "jsonwebtoken";
-import prisma from "../../../utils/prisma";
+import prisma from "../../../lib/prisma";
 
 export default async function hhandler(
   req: NextApiRequest,
@@ -45,5 +45,14 @@ export default async function hhandler(
     },
   });
 
-  return res.status(200).json({ customer });
+  if (!customer)
+    return res.status(401).json({ errorMessage: "Unauthorized request" });
+
+  return res.status(200).json({
+    firstName: customer.firstName,
+    lastName: customer.lastName,
+    email: customer.email,
+    phoneNumber: customer.phoneNumber,
+    city: customer.city,
+  });
 }

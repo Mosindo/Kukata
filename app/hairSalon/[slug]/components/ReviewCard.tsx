@@ -1,6 +1,6 @@
 import { Review } from "@prisma/client";
 import Stars from "../../../components/Stars";
-import prisma from "../../../../utils/prisma";
+import prisma from "../../../../lib/prisma";
 
 interface CustomerType {
   id: number;

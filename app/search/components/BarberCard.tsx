@@ -2,7 +2,7 @@ import { PRICERANGE, Location, Review } from "@prisma/client";
 import Link from "next/link";
 import React from "react";
 import Price from "../../components/Price";
-import { calculateReviewRatingAverage } from "../../../utils/calculateReviewRateAverage";
+import { calculateReviewRatingAverage } from "../../../lib/calculateReviewRateAverage";
 import Stars from "../../components/Stars";
 
 interface BarberCardProps {

@@ -6,6 +6,7 @@ import Modal from "@mui/material/Modal";
 import AuthModalInputs from "./AuthModalInputs";
 import useAuth from "../../hooks/useAuth";
 import { AuthenticationContext } from "../context/AuthContext";
+import { Alert, CircularProgress } from "@mui/material";
 
 const style = {
   position: "absolute" as "absolute",
@@ -25,7 +26,7 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const { signin } = useAuth();
+  const { signin, signup } = useAuth();
 
   const renderContent = (signinContent: string, signupContent: string) => {
     return isSignin ? signinContent : signupContent;
@@ -72,9 +73,9 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
 
   const handleClick = () => {
     if (isSignin) {
-      signin({ email: inputs.email, password: inputs.password });
+      signin({ email: inputs.email, password: inputs.password }, handleClose);
     } else {
-      // signup
+      signup(inputs, handleClose);
     }
   };
 
@@ -96,31 +97,44 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <div className="uppercase font-bold text-center pb-2 border-bottom mb-2">
-            <p className="text-sm">
-              {renderContent("Sign In", "Create Account")}
-            </p>
-          </div>
-          <div className="m-auto">
-            <h2 className="text-2xl font-light text-center">
-              {renderContent(
-                "Log Into Your Account",
-                "Create Your Kukata Account"
-              )}
-            </h2>
-            <AuthModalInputs
-              inputs={inputs}
-              handleChangeInput={handleChangeInput}
-              isSignin={isSignin}
-            />
-            <button
-              className="uppercase bg-red-600 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400"
-              disabled={disabled}
-              onClick={handleClick}
-            >
-              {renderContent("Sign In", "Create Account")}
-            </button>
-          </div>
+          {loading ? (
+            <div className="py-24 px-2 h-[600px] flex justify-center">
+              <CircularProgress />
+            </div>
+          ) : (
+            <div className="p-2 h-[-600px]">
+              {error ? (
+                <Alert severity="error" className="mb-4">
+                  {error}
+                </Alert>
+              ) : null}
+              <div className="uppercase font-bold text-center pb-2 border-bottom mb-2">
+                <p className="text-sm">
+                  {renderContent("Sign In", "Create Account")}
+                </p>
+              </div>
+              <div className="m-auto">
+                <h2 className="text-2xl font-light text-center">
+                  {renderContent(
+                    "Log Into Your Account",
+                    "Create Your Kukata Account"
+                  )}
+                </h2>
+                <AuthModalInputs
+                  inputs={inputs}
+                  handleChangeInput={handleChangeInput}
+                  isSignin={isSignin}
+                />
+                <button
+                  className="uppercase bg-red-600 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400"
+                  disabled={disabled}
+                  onClick={handleClick}
+                >
+                  {renderContent("Sign In", "Create Account")}
+                </button>
+              </div>
+            </div>
+          )}
         </Box>
       </Modal>
     </div>
