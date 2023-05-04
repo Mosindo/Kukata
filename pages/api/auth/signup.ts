@@ -3,14 +3,23 @@ import validator from "validator";
 import prisma from "../../../lib/prisma";
 import { setCookie } from "cookies-next";
 import { supabase } from "../../../lib/supabase";
+import { USERCATEGORY } from "@prisma/client";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { firstName, lastName, email, password, phoneNumber, city } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneNumber,
+      city,
+      role,
+      hairSalonId,
+    } = req.body;
     const errors: string[] = [];
     const validatorSchema = [
       {
@@ -66,36 +75,79 @@ export default async function handler(
       return res.status(400).json({ errorMessage: error.message });
     }
     // const hashedPassword = await bcrypt.hash(password, 10);
+    if (role === USERCATEGORY.CUSTOMER) {
+      const customer = await prisma.customer.create({
+        data: {
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          city,
+          userId: data.user?.id,
+          // password: hashedPassword,
+        },
+      });
 
-    const customer = await prisma.customer.create({
-      data: {
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        city,
-        userId: data.user?.id,
-        // password: hashedPassword,
-      },
-    });
+      // const alg = "HS256";
 
-    // const alg = "HS256";
+      // const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+      // const token = await new jose.SignJWT({ email: customer.email })
+      //   .setProtectedHeader({ alg })
+      //   .setExpirationTime("24h")
+      //   .sign(secret);
+      const token = data.session?.access_token;
 
-    // const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    // const token = await new jose.SignJWT({ email: customer.email })
-    //   .setProtectedHeader({ alg })
-    //   .setExpirationTime("24h")
-    //   .sign(secret);
-    const token = data.session?.access_token;
+      setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
+      return res.status(200).json({
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        email: customer.email,
+        phone: customer.phoneNumber,
+        city: customer.city,
+      });
+    } else if (role === USERCATEGORY.STYLIST) {
+      const stylist = await prisma.stylist.create({
+        data: {
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          userId: data.user?.id,
+          hairSalonId,
+        },
+      });
 
-    setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
-    return res.status(200).json({
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      email: customer.email,
-      phone: customer.phoneNumber,
-      city: customer.city,
-    });
+      const token = data.session?.access_token;
+
+      setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
+      return res.status(200).json({
+        firstName: stylist.firstName,
+        lastName: stylist.lastName,
+        email: stylist.email,
+        phone: stylist.phoneNumber,
+        hairSalonId: stylist.hairSalonId,
+      });
+    } else if (role === USERCATEGORY.OWNER) {
+      const owner = await prisma.owner.create({
+        data: {
+          firstName,
+          lastName,
+          email,
+          userId: data.user?.id,
+          phoneNumber,
+        },
+      });
+
+      const token = data.session?.access_token;
+
+      setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
+      return res.status(200).json({
+        firstName: owner.firstName,
+        lastName: owner.lastName,
+        email: owner.email,
+        phone: owner.phoneNumber,
+      });
+    }
   }
   return res.status(404).json("Unknown endpoint");
 }

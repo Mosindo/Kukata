@@ -3,9 +3,10 @@
 import { useState, createContext, useEffect } from "react";
 import axios from "axios";
 import { getCookie } from "cookies-next";
+import { USERCATEGORY } from "@prisma/client";
 
 interface Customer {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -14,10 +15,32 @@ interface Customer {
   password: string;
   createdAt: Date;
   updatedAt: Date;
+  role: USERCATEGORY;
 }
-
+interface Owner {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
+  role: USERCATEGORY;
+}
+interface Stylist {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phoneNumber?: string;
+  password?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  role: USERCATEGORY;
+}
 interface State {
-  data: Customer | null;
+  data: Customer | Owner | Stylist | null;
   loading: boolean;
   error: string | null;
 }

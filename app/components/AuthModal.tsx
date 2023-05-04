@@ -46,6 +46,7 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     city: "",
     password: "",
     phoneNumber: "",
+    role: "",
   });
 
   const [disabled, setDisabled] = useState(true);

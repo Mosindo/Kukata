@@ -11,7 +11,7 @@ datasource db {
 }
 
 model HairSalon {
-  id          Int        @id @default(autoincrement())
+  id          String        @id @default(cuid())
   name        String
   mainImage   String
   images      String[]
@@ -27,23 +27,66 @@ model HairSalon {
   lastName    String
   email       String     @unique
   userId      String?
-  locationId  Int        @unique
-  location    Location   @relation(fields: [locationId], references: [id])
+  locationId  Int?         @unique
+  location    Location?   @relation(fields: [locationId], references: [id])
   phoneNumber String?
   stylists    Stylist[]
   reviews     Review[]
   queues       Queue[]
+  ownerId     String?
+  owner       Owner?    @relation(fields: [ownerId], references: [id])
 }
-
+model Owner {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String  @unique
+  userId    String?
+  phoneNumber String?
+  role      USERCATEGORY @default(OWNER)
+  hairSalon HairSalon[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Stylist {
+  id           Int           @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  phoneNumber  String?
+  email        String?       @unique
+  role         USERCATEGORY  @default(STYLIST)
+  userId       String?
+  images       String[]
+  mainImage    String?
+  hairSalonId  String
+  hairSalon    HairSalon     @relation(fields: [hairSalonId], references: [id])
+  // appointments Appointment[]
+  queues       Queue[]
+}
+model Customer {
+  id           String           @id @default(cuid())
+  firstName    String
+  lastName     String
+  phoneNumber  String
+  email        String        @unique
+  userId       String? 
+  role         USERCATEGORY  @default(CUSTOMER)
+  // appointments Appointment[]
+  city         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime?     @updatedAt
+  reviews      Review[]
+  queues       Queue[]
+}
 model Service {
   id           Int           @id @default(autoincrement())
   name         String
   description  String?
   price        String
-  hairSalonId  Int
+  hairSalonId  String
   hairSalon    HairSalon     @relation(fields: [hairSalonId], references: [id])
   duration     Int
-  appointments Appointment[]
+  // appointments Appointment[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
@@ -59,53 +102,26 @@ model Location {
   updatedAt DateTime   @updatedAt
 }
 
-model Appointment {
-  id         Int      @id @default(autoincrement())
-  date       DateTime
-  customerId Int
-  customer   Customer @relation(fields: [customerId], references: [id])
-  stylistId  Int
-  stylist    Stylist  @relation(fields: [stylistId], references: [id])
-  serviceId  Int
-  service    Service  @relation(fields: [serviceId], references: [id])
-}
+// model Appointment {
+//   id         Int      @id @default(autoincrement())
+//   date       DateTime
+//   customerId String
+//   customer   Customer @relation(fields: [customerId], references: [id])
+//   stylistId  Int
+//   stylist    Stylist  @relation(fields: [stylistId], references: [id])
+//   serviceId  Int
+//   service    Service  @relation(fields: [serviceId], references: [id])
+// }
 
-model Customer {
-  id           Int           @id @default(autoincrement())
-  firstName    String
-  lastName     String
-  phoneNumber  String
-  email        String        @unique
-  userId       String? 
-  appointments Appointment[]
-  city         String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime?     @updatedAt
-  reviews      Review[]
-  queues       Queue[]
-}
 
-model Stylist {
-  id           Int           @id @default(autoincrement())
-  firstName    String
-  lastName     String
-  phoneNumber  String?
-  email        String?       @unique
-  userId       String?
-  images       String[]
-  mainImage    String
-  hairSalonId  Int
-  hairSalon    HairSalon     @relation(fields: [hairSalonId], references: [id])
-  appointments Appointment[]
-  queues       Queue[]
-}
+
 
 model Review {
   id          Int       @id @default(autoincrement())
   hairSalon   HairSalon @relation(fields: [hairSalonId], references: [id])
-  hairSalonId Int
+  hairSalonId String
   customer    Customer  @relation(fields: [customerId], references: [id])
-  customerId  Int
+  customerId  String
   rating      Float
   comment     String
   createdAt   DateTime  @default(now())
@@ -114,13 +130,13 @@ model Review {
 
 model Queue {
   id           Int      @id @default(autoincrement())
-  hairSalonId  Int
+  hairSalonId  String
   hairSalon    HairSalon @relation(fields: [hairSalonId], references: [id])
-  customerId   Int
+  customerId   String
   customer     Customer  @relation(fields: [customerId], references: [id])
   stylistId    Int
   stylist      Stylist   @relation(fields: [stylistId], references: [id])
-  position     Int
+  position     Int   @default(autoincrement())    
   status       QUEUESTATUS
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -129,6 +145,11 @@ enum PRICERANGE {
   EXPENSIVE
   MEDIUM
   CHEAP
+}
+enum USERCATEGORY {
+  CUSTOMER
+  OWNER
+  STYLIST 
 }
 
 enum QUEUESTATUS {
