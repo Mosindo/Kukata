@@ -1,12 +1,10 @@
 import axios from "axios";
-import { getCookie, removeCookies } from "cookies-next";
+import { removeCookies } from "cookies-next";
 import { useContext } from "react";
 import { AuthenticationContext } from "../app/context/AuthContext";
 
 const useAuth = () => {
-  const { data, error, loading, setAuthState } = useContext(
-    AuthenticationContext
-  );
+  const { error, setAuthState } = useContext(AuthenticationContext);
 
   const signin = async (
     {
@@ -81,12 +79,16 @@ const useAuth = () => {
           phoneNumber,
         }
       );
+
       setAuthState({
         data: response.data,
         error: null,
         loading: false,
       });
-      handleClose();
+
+      if (!error) {
+        handleClose();
+      }
     } catch (error: any) {
       setAuthState({
         data: null,
