@@ -7,6 +7,7 @@ import AuthModalInputs from "./AuthModalInputs";
 import useAuth from "../../hooks/useAuth";
 import { AuthenticationContext } from "../context/AuthContext";
 import { Alert, CircularProgress } from "@mui/material";
+import { USERCATEGORY } from "@prisma/client";
 
 const style = {
   position: "absolute" as "absolute",
@@ -32,7 +33,9 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     return isSignin ? signinContent : signupContent;
   };
 
-  const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeInput = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setInputs({
       ...inputs,
       [e.target.name]: e.target.value,
@@ -46,7 +49,7 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     city: "",
     password: "",
     phoneNumber: "",
-    role: "",
+    role: USERCATEGORY.CUSTOMER,
   });
 
   const [disabled, setDisabled] = useState(true);

@@ -41,11 +41,23 @@ export default async function handler(
       },
     });
 
-    if (!customer) {
-      return res
-        .status(401)
-        .json({ errorMessage: "Email or password is invalid" });
-    }
+    const owner = await prisma.owner.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    const stylist = await prisma.stylist.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    // if (!customer || !owner || !stylist) {
+    //   return res.status(401).json({
+    //     errorMessage: "Email or password is invalid",
+    //   });
+    // }
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -72,15 +84,35 @@ export default async function handler(
     //   .setExpirationTime("24h")
     //   .sign(secret);
     const token = data.session?.access_token;
+    console.log(data.session);
     setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
-
-    return res.status(200).json({
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      email: customer.email,
-      phoneNumber: customer.phoneNumber,
-      city: customer.city,
-    });
+    if (customer) {
+      return res.status(200).json({
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        email: customer.email,
+        phoneNumber: customer.phoneNumber,
+        city: customer.city,
+        role: data.session?.user.role,
+      });
+    } else if (owner) {
+      return res.status(200).json({
+        firstName: owner.firstName,
+        lastName: owner.lastName,
+        email: owner.email,
+        phoneNumber: owner.phoneNumber,
+        role: data.session?.user.role,
+      });
+    } else if (stylist) {
+      return res.status(200).json({
+        firstName: stylist.firstName,
+        lastName: stylist.lastName,
+        email: stylist.email,
+        phoneNumber: stylist.phoneNumber,
+        hairSalonId: stylist.hairSalonId,
+        role: data.session?.user.role,
+      });
+    }
   }
 
   return res.status(404).json("Unknown endpoint");

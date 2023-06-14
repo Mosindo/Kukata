@@ -1,4 +1,4 @@
-import { PRICERANGE, PrismaClient } from "@prisma/client";
+import { PRICERANGE } from "@prisma/client";
 import BarberCard from "./components/BarberCard";
 import Header from "./components/Header";
 import SearchSideBar from "./components/SearchSideBar";

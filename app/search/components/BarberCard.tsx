@@ -38,7 +38,7 @@ const BarberCard = ({ hairSalon }: { hairSalon: BarberCardProps }) => {
             <p className="mr-4">Mexican</p>
             <p className="mr-4">
               {`
-                ${hairSalon.location.address}, ${hairSalon.location.zipCode} ${hairSalon.location.city}`}
+                ${hairSalon.location?.address}, ${hairSalon.location?.zipCode} ${hairSalon.location?.city}`}
             </p>
           </div>
         </div>

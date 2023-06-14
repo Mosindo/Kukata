@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../lib/prisma";
-import { HairSalon } from "@prisma/client";
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,7 +23,7 @@ export default async function handler(
     ownerId,
   } = req.body;
 
-  if (req.method === "POST") {
+  if (req.method === "POST" && userId) {
     try {
       const hairSalonData = {
         name,
@@ -38,7 +37,6 @@ export default async function handler(
         firstName,
         lastName,
         email,
-        userId,
         phoneNumber,
         ownerId,
         locationId,

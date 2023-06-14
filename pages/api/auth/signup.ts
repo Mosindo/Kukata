@@ -43,7 +43,7 @@ export default async function handler(
         errorMessage: "Phone number must be 10 characters",
       },
       {
-        valid: validator.isLength(city, { min: 1 }),
+        valid: city ? validator.isLength(city, { min: 1 }) : true,
         errorMessage: "City must be between 1 and 20 characters",
       },
     ];

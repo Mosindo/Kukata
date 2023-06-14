@@ -3,13 +3,25 @@
 import Link from "next/link";
 import React, { useContext } from "react";
 import AuthModal from "./AuthModal";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 import { AuthenticationContext } from "../context/AuthContext";
 import useAuth from "../../hooks/useAuth";
+import { IconButton, Menu, MenuItem } from "@mui/material";
 
 const Navbar = () => {
   const { data, loading } = useContext(AuthenticationContext);
   const { signout } = useAuth();
-  console.log(data);
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <nav className="bg-white p-2 flex justify-between">
       <Link
@@ -23,12 +35,37 @@ const Navbar = () => {
           {loading ? null : (
             <div className="flex">
               {data ? (
-                <button
-                  className="bg-blue-400 text-white border p-1 px-4 rounded mr-3"
-                  onClick={signout}
-                >
-                  Sign out
-                </button>
+                <>
+                  <IconButton
+                    size="large"
+                    aria-label="account of current user"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleMenu}
+                    color="inherit"
+                  >
+                    <AccountCircle />
+                  </IconButton>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                  >
+                    <MenuItem onClick={handleClose}>Profile</MenuItem>
+                    <MenuItem onClick={handleClose}>My account</MenuItem>
+                    <MenuItem onClick={signout}>Sign out</MenuItem>
+                  </Menu>
+                </>
               ) : (
                 <>
                   <AuthModal isSignin={true} />

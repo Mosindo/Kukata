@@ -30,7 +30,7 @@ const BarberCard = ({ hairSalon }: HairSalon) => {
           </div>
           <div className="flex text-reg font-light capitalize">
             <Price price={hairSalon.priceRange} />
-            <p>{hairSalon.location.city}</p>
+            <p>{hairSalon.location?.city}</p>
           </div>
           <p className="text-sm mt-1 font-bold">Booked 3 times today</p>
         </div>

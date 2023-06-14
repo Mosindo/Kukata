@@ -10,15 +10,15 @@ import { notFound } from "next/navigation";
 import prisma from "../../../lib/prisma";
 
 interface HairSalonType {
+  location: Location | null;
+  reviews: Review[];
+  id: string;
   name: string;
-  id: number;
   mainImage: string;
   images: string[];
   description: string;
   slug: string;
   priceRange: PRICERANGE;
-  location: Location;
-  reviews: Review[];
 }
 const fetchHairSalonBySlug = async (slug: string): Promise<HairSalonType> => {
   const hairSalon = await prisma.hairSalon.findUnique({

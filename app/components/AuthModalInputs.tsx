@@ -1,3 +1,4 @@
+import { USERCATEGORY } from "@prisma/client";
 import React from "react";
 
 interface AuthModalInputsProps {
@@ -8,12 +9,22 @@ interface AuthModalInputsProps {
     phoneNumber: string;
     city: string;
     password: string;
+    role: USERCATEGORY;
   };
 
   // eslint-disable-next-line no-unused-vars
-  handleChangeInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChangeInput: (
+    // eslint-disable-next-line no-unused-vars
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
   isSignin: boolean;
 }
+
+const userCategories = {
+  CUSTOMER: "CUSTOMER",
+  OWNER: "OWNER",
+  STYLIST: "STYLIST",
+};
 
 const AuthModalInputs = ({
   inputs,
@@ -22,6 +33,19 @@ const AuthModalInputs = ({
 }: AuthModalInputsProps) => {
   return (
     <div>
+      {isSignin ? null : (
+        <select
+          value={inputs.role}
+          onChange={handleChangeInput}
+          className="border rounded p-2 py-3 w-[49%]"
+        >
+          {Object.values(userCategories).map((category) => (
+            <option key={category} value={category}>
+              {category.toLowerCase()}
+            </option>
+          ))}
+        </select>
+      )}
       {isSignin ? null : (
         <div className="my-3 flex justify-between text-sm">
           <input

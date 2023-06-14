@@ -71,7 +71,6 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
     });
     try {
       const jwt = getCookie("jwt");
-
       if (!jwt) {
         return setAuthState({
           data: null,

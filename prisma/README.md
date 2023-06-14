@@ -15,3 +15,7 @@ ALTER SEQUENCE "Appointment_id_seq" RESTART WITH 1;
 ALTER SEQUENCE "Review_id_seq" RESTART WITH 1;
 ALTER SEQUENCE "Service_id_seq" RESTART WITH 1;
 alter sequence "Customer_id_seq" restart with 1 ;
+
+//update prisma schema
+prisma generate
+npx prisma db push

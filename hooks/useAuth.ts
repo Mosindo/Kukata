@@ -52,6 +52,7 @@ const useAuth = () => {
       lastName,
       city,
       phoneNumber,
+      role,
     }: {
       email: string;
       password: string;
@@ -59,6 +60,7 @@ const useAuth = () => {
       lastName: string;
       city: string;
       phoneNumber: string;
+      role: string;
     },
     handleClose: () => void
   ) => {
@@ -77,6 +79,7 @@ const useAuth = () => {
           lastName,
           city,
           phoneNumber,
+          role
         }
       );
 

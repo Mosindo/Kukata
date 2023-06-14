@@ -26,7 +26,6 @@ model HairSalon {
   firstName   String
   lastName    String
   email       String     @unique
-  userId      String?
   locationId  Int?         @unique
   location    Location?   @relation(fields: [locationId], references: [id])
   phoneNumber String?
