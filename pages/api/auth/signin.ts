@@ -1,8 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import validator from "validator";
 import { setCookie } from "cookies-next";
 import prisma from "../../../lib/prisma";
-import { supabase } from "../../../lib/supabase";
+import { Database } from "../../../lib/database.types";
+import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 export default async function handler(
   req: NextApiRequest,
@@ -58,11 +61,13 @@ export default async function handler(
     //     errorMessage: "Email or password is invalid",
     //   });
     // }
-
+    const supabase = createServerComponentClient<Database>({ cookies });
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+
+    revalidatePath("/");
 
     if (error) {
       return res.status(401).json({ errorMessage: error.message });

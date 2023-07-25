@@ -4,14 +4,14 @@ import { Location, PRICERANGE, Review } from "@prisma/client";
 import prisma from "../lib/prisma";
 
 export interface HairSalonCardType {
-  id: number;
+  id: string;
   name: string;
-  location: Location;
+  location?: Location;
   description: string;
   mainImage: string;
   priceRange: PRICERANGE;
   slug: string;
-  reviews: Review[];
+  reviews?: Review[];
 }
 
 const fetchHairSalons = async (): Promise<HairSalonCardType[]> => {
