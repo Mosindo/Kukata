@@ -1,12 +1,8 @@
 "use client";
 
-import React, { useContext } from "react";
-import { AuthenticationContext } from "../../context/AuthContext";
+import { supabase } from "../../../lib/supabase";
 
-export const ProfileContent = () => {
-  const { data } = useContext(AuthenticationContext);
-
-  console.log("profilecontent", data);
+export const ProfileContent = async () => {
   return (
     <div>
       <h1>ProfileContent</h1>

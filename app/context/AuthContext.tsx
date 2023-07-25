@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, createContext, useEffect } from "react";
-import axios from "axios";
-import { getCookie } from "cookies-next";
 import { USERCATEGORY } from "@prisma/client";
+import { supabase } from "../../lib/supabase";
 
 interface Customer {
   id: string;
@@ -70,8 +69,12 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
       loading: true,
     });
     try {
-      const jwt = getCookie("jwt");
-      if (!jwt) {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      console.log("session!!! :", session);
+
+      if (!session) {
         return setAuthState({
           data: null,
           error: null,
@@ -79,16 +82,8 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
         });
       }
 
-      const response = await axios.get("http://localhost:3000/api/auth/me", {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-
-      axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
-
       setAuthState({
-        data: response.data,
+        data: session.user as any,
         error: null,
         loading: false,
       });
@@ -104,7 +99,6 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     fetchUser();
   }, []);
-
   return (
     <AuthenticationContext.Provider value={{ ...AuthState, setAuthState }}>
       {children}

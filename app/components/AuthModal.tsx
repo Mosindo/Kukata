@@ -21,9 +21,7 @@ const style = {
 };
 
 const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
-  const { error, data, setAuthState, loading } = useContext(
-    AuthenticationContext
-  );
+  const { error, loading } = useContext(AuthenticationContext);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

@@ -1,5 +1,4 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { PRICERANGE } from "@prisma/client";
+import { PRICERANGE, USERCATEGORY } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../lib/prisma";
 import { supabase } from "../../lib/supabase";
@@ -23,12 +22,11 @@ async function createSupabaseUser(email: string, password: string) {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-  await prisma.review.deleteMany();
-  // await prisma.appointment.deleteMany();
   await prisma.queue.deleteMany();
-  await prisma.service.deleteMany();
-  await prisma.stylist.deleteMany();
+  await prisma.review.deleteMany();
   await prisma.customer.deleteMany();
+  await prisma.stylist.deleteMany();
+  await prisma.service.deleteMany();
   await prisma.hairSalon.deleteMany();
   await prisma.location.deleteMany();
   await prisma.owner.deleteMany();
@@ -46,21 +44,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
     },
   });
 
-  const location2 = await prisma.location.create({
+  // Create Owner
+  const owner1 = await prisma.owner.create({
     data: {
-      city: "Lyon",
-      country: "France",
-      address: "25, Rue de la République",
-      zipCode: "69002",
-    },
-  });
-
-  const location3 = await prisma.location.create({
-    data: {
-      city: "Marseille",
-      country: "France",
-      address: "4, Boulevard Charles Livon",
-      zipCode: "13007",
+      firstName: "Alice",
+      lastName: "Smith",
+      email: "alice@example.com",
+      phoneNumber: "0123456789",
+      role: USERCATEGORY.OWNER,
     },
   });
 
@@ -82,11 +73,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       closingTime: new Date("2023-04-12T18:00:00"),
       slug: "salon-a",
       priceRange: PRICERANGE.MEDIUM,
-      firstName: "Alice",
-      lastName: "Smith",
-      email: "alice@example.com",
-      phoneNumber: "0123456789",
       locationId: location1.id,
+      ownerId: owner1.id,
+      email: "salona@hotmail.fr",
     },
   });
 
@@ -97,16 +86,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       description: "Service A description",
       price: "20.00",
       duration: 30,
-      hairSalonId: salon.id,
-    },
-  });
-
-  const service2 = await prisma.service.create({
-    data: {
-      name: "Service B",
-      description: "Service B description",
-      price: "30.00",
-      duration: 45,
       hairSalonId: salon.id,
     },
   });
@@ -128,23 +107,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       ],
       mainImage: imageUrl,
       hairSalonId: salon.id,
-    },
-  });
-
-  const stylist2 = await prisma.stylist.create({
-    data: {
-      firstName: "Stylist B",
-      lastName: "Johnson",
-      phoneNumber: "0123456789",
-      email: "stylistb@example.com",
-      images: [
-        "https://picsum.photos/200",
-        "https://picsum.photos/200",
-        "https://picsum.photos/200",
-        "https://picsum.photos/200",
-      ],
-      mainImage: imageUrl,
-      hairSalonId: salon.id,
+      role: USERCATEGORY.STYLIST,
     },
   });
 
@@ -156,26 +119,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       phoneNumber: "0123456789",
       email: "customerawilliams@example.com",
       city: "Paris",
-    },
-  });
-
-  const customer2 = await prisma.customer.create({
-    data: {
-      firstName: "Customer B",
-      lastName: "Brown",
-      phoneNumber: "0123456789",
-      email: "customerbbrown@example.com",
-      city: "Lyon",
-    },
-  });
-
-  const customer3 = await prisma.customer.create({
-    data: {
-      firstName: "Customer C",
-      lastName: "Moore",
-      phoneNumber: "0123456789",
-      email: "customercmoore@example.com",
-      city: "Marseille",
+      role: USERCATEGORY.CUSTOMER,
     },
   });
 
@@ -189,52 +133,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
     },
   });
 
-  const review2 = await prisma.review.create({
-    data: {
-      hairSalonId: salon.id,
-      customerId: customer2.id,
-      rating: 3.5,
-      comment: "Good service, but a bit expensive.",
-    },
-  });
-
-  const review3 = await prisma.review.create({
-    data: {
-      hairSalonId: salon.id,
-      customerId: customer3.id,
-      rating: 5.0,
-      comment: "Amazing experience!",
-    },
-  });
-
   // Create queues
   const queue1 = await prisma.queue.create({
     data: {
       hairSalonId: salon.id,
-      customerId: customer1.id,
       stylistId: stylist1.id,
-      position: 1,
-      status: "WAITING",
-    },
-  });
-
-  const queue2 = await prisma.queue.create({
-    data: {
-      hairSalonId: salon.id,
-      customerId: customer2.id,
-      stylistId: stylist2.id,
-      position: 2,
-      status: "IN_PROGRESS",
-    },
-  });
-
-  const queue3 = await prisma.queue.create({
-    data: {
-      hairSalonId: salon.id,
-      customerId: customer3.id,
-      stylistId: stylist1.id,
-      position: 3,
-      status: "COMPLETED",
+      Customer: {
+        connect: {
+          id: customer1.id,
+        },
+      },
     },
   });
 

@@ -13,7 +13,7 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     const errors: string[] = [];
-    const { email, password } = req.body;
+    const { email, password, data } = req.body;
 
     const validationSchema = [
       {
@@ -61,17 +61,7 @@ export default async function handler(
     //     errorMessage: "Email or password is invalid",
     //   });
     // }
-    const supabase = createServerComponentClient<Database>({ cookies });
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
 
-    revalidatePath("/");
-
-    if (error) {
-      return res.status(401).json({ errorMessage: error.message });
-    }
     // const isMatch = await bcrypt.compare(password, customer.password);
 
     // if (!isMatch) {
@@ -88,9 +78,9 @@ export default async function handler(
     //   .setProtectedHeader({ alg })
     //   .setExpirationTime("24h")
     //   .sign(secret);
-    const token = data.session?.access_token;
-    console.log(data.session);
-    setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
+    // const token = data.session?.access_token;
+    // console.log(data.session);
+    // setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
     if (customer) {
       return res.status(200).json({
         firstName: customer.firstName,

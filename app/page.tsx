@@ -2,16 +2,17 @@ import Header from "./components/Header";
 import BarberCard from "./components/BarberCard";
 import { Location, PRICERANGE, Review } from "@prisma/client";
 import prisma from "../lib/prisma";
+import { supabase } from "../lib/supabase";
 
 export interface HairSalonCardType {
   id: string;
   name: string;
-  location?: Location;
-  description: string;
-  mainImage: string;
-  priceRange: PRICERANGE;
+  location: Location | null;
+  description: string | null;
+  mainImage: string | null;
+  priceRange: PRICERANGE | null;
   slug: string;
-  reviews?: Review[];
+  reviews: Review[];
 }
 
 const fetchHairSalons = async (): Promise<HairSalonCardType[]> => {
@@ -19,16 +20,38 @@ const fetchHairSalons = async (): Promise<HairSalonCardType[]> => {
     select: {
       id: true,
       name: true,
-      location: true,
       description: true,
       mainImage: true,
       slug: true,
       priceRange: true,
-      reviews: true,
+      location: {
+        select: {
+          id: true,
+          city: true,
+          country: true,
+          address: true,
+          zipCode: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+      reviews: {
+        select: {
+          id: true,
+          hairSalonId: true,
+          customerId: true,
+          rating: true,
+          comment: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
     },
   });
+
   return hairSalons;
 };
+
 export default async function Home() {
   const hairSalons = await fetchHairSalons();
 

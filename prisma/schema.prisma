@@ -45,7 +45,7 @@ model Owner {
 }
 
 model Stylist {
-  id          String       @id
+  id          String       @id @default(cuid())
   firstName   String
   lastName    String
   phoneNumber String?
@@ -53,7 +53,7 @@ model Stylist {
   images      String[]
   mainImage   String?
   hairSalonId String
-  userId      String?
+  userId      String? 
   role        USERCATEGORY @default(STYLIST)
   queues      Queue[]
   hairSalon   HairSalon    @relation(fields: [hairSalonId], references: [id], onDelete: Cascade)
@@ -76,7 +76,7 @@ model Customer {
 }
 
 model Service {
-  id          String    @id
+  id          String    @id @default(cuid())
   name        String
   description String?
   price       String
@@ -88,7 +88,7 @@ model Service {
 }
 
 model Location {
-  id        String     @id
+  id        String     @id @default(cuid())
   city      String
   country   String
   address   String
@@ -99,7 +99,7 @@ model Location {
 }
 
 model Review {
-  id          String    @id
+  id          String    @id @default(cuid())
   hairSalonId String
   customerId  String
   rating      Float
@@ -111,7 +111,7 @@ model Review {
 }
 
 model Queue {
-  id          String     @id
+  id          String     @id @default(cuid())
   hairSalonId String
   stylistId   String
   createdAt   DateTime   @default(now())

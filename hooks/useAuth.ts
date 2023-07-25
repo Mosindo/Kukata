@@ -1,10 +1,12 @@
 import axios from "axios";
-import { removeCookies } from "cookies-next";
 import { useContext } from "react";
 import { AuthenticationContext } from "../app/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { supabase } from "../lib/supabase";
 
 const useAuth = () => {
   const { error, setAuthState } = useContext(AuthenticationContext);
+  const router = useRouter();
 
   const signin = async (
     {
@@ -22,11 +24,24 @@ const useAuth = () => {
       loading: true,
     });
     try {
+      const { data, error: errorAuth } = await supabase.auth.signInWithPassword(
+        {
+          email,
+          password,
+        }
+      );
+
+      if (errorAuth) {
+        console.error("Error creating Supabase user:", errorAuth);
+        throw errorAuth;
+      }
+
       const response = await axios.post(
         "http://localhost:3000/api/auth/signin",
         {
           email,
           password,
+          data,
         }
       );
 
@@ -35,7 +50,9 @@ const useAuth = () => {
         error: null,
         loading: false,
       });
+      router.refresh();
       handleClose();
+      router.refresh();
     } catch (error: any) {
       setAuthState({
         data: null,
@@ -70,6 +87,22 @@ const useAuth = () => {
       loading: true,
     });
     try {
+      const { data, error: errorAuth } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: "http://localhost:3000/auth/callback",
+          data: {
+            firstName,
+            lastName,
+          },
+        },
+      });
+      if (errorAuth) {
+        console.error("Error creating Supabase user:", errorAuth);
+        throw errorAuth;
+      }
+      router.refresh();
       const response = await axios.post(
         "http://localhost:3000/api/auth/signup",
         {
@@ -79,7 +112,8 @@ const useAuth = () => {
           lastName,
           city,
           phoneNumber,
-          role
+          role,
+          data,
         }
       );
 
@@ -92,6 +126,7 @@ const useAuth = () => {
       if (!error) {
         handleClose();
       }
+      router.refresh();
     } catch (error: any) {
       setAuthState({
         data: null,
@@ -101,9 +136,9 @@ const useAuth = () => {
     }
   };
 
-  const signout = () => {
-    removeCookies("jwt");
-
+  const signout = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
     setAuthState({
       data: null,
       error: null,

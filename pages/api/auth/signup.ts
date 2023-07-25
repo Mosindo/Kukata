@@ -19,6 +19,7 @@ export default async function handler(
       city,
       role,
       hairSalonId,
+      data,
     } = req.body;
     const errors: string[] = [];
     const validatorSchema = [
@@ -64,16 +65,22 @@ export default async function handler(
       },
     });
 
-    if (customerWithSameEmail) {
+    const stylistWithSameEmail = await prisma.stylist.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    const ownerWithSameEmail = await prisma.owner.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (customerWithSameEmail || stylistWithSameEmail || ownerWithSameEmail) {
       return res.status(400).json({ errorMessage: "Email already exists" });
     }
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    if (error) {
-      return res.status(400).json({ errorMessage: error.message });
-    }
+
     // const hashedPassword = await bcrypt.hash(password, 10);
     if (role === USERCATEGORY.CUSTOMER) {
       const customer = await prisma.customer.create({
@@ -106,6 +113,12 @@ export default async function handler(
         city: customer.city,
       });
     } else if (role === USERCATEGORY.STYLIST) {
+      if (!hairSalonId) {
+        return res
+          .status(400)
+          .json({ errorMessage: "A hair salon ID is required for a stylist" });
+      }
+
       const stylist = await prisma.stylist.create({
         data: {
           firstName,

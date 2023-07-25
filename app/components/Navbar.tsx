@@ -6,7 +6,7 @@ import AuthModal from "./AuthModal";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { AuthenticationContext } from "../context/AuthContext";
 import useAuth from "../../hooks/useAuth";
-import { IconButton, Menu, MenuItem } from "@mui/material";
+import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 
 const Navbar = () => {
   const { data, loading } = useContext(AuthenticationContext);
@@ -70,6 +70,9 @@ const Navbar = () => {
                 <>
                   <AuthModal isSignin={true} />
                   <AuthModal isSignin={false} />
+                  <Button variant="contained" color="primary" onClick={signout}>
+                    Signout
+                  </Button>
                 </>
               )}
             </div>
