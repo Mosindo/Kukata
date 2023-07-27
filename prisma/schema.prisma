@@ -36,7 +36,7 @@ model Owner {
   firstName   String
   lastName    String
   email       String       @unique
-  userId      String?
+  userId      String?      @unique
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   role        USERCATEGORY @default(OWNER)
@@ -53,7 +53,7 @@ model Stylist {
   images      String[]
   mainImage   String?
   hairSalonId String
-  userId      String? 
+  userId      String?      @unique
   role        USERCATEGORY @default(STYLIST)
   queues      Queue[]
   hairSalon   HairSalon    @relation(fields: [hairSalonId], references: [id], onDelete: Cascade)
@@ -68,7 +68,7 @@ model Customer {
   city        String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime?    @updatedAt
-  userId      String?
+  userId      String?      @unique
   role        USERCATEGORY @default(CUSTOMER)
   queueId     String?
   Queue       Queue?       @relation(fields: [queueId], references: [id])

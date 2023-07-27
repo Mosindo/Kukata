@@ -7,7 +7,7 @@ import Stars from "../../components/Stars";
 
 interface BarberCardProps {
   slug: string;
-  id: number;
+  id: string;
   name: string;
   location: Location;
   mainImage: string;

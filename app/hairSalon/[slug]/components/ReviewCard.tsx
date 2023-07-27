@@ -3,12 +3,12 @@ import Stars from "../../../components/Stars";
 import prisma from "../../../../lib/prisma";
 
 interface CustomerType {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
 }
 
-const fetchCustomerById = async (id: number): Promise<CustomerType> => {
+const fetchCustomerById = async (id: string): Promise<CustomerType> => {
   const customer = await prisma.customer.findUnique({
     where: {
       id,

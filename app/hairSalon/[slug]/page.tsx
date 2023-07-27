@@ -14,11 +14,11 @@ interface HairSalonType {
   reviews: Review[];
   id: string;
   name: string;
-  mainImage: string;
+  mainImage?: string | null;
   images: string[];
-  description: string;
+  description?: string | null;
   slug: string;
-  priceRange: PRICERANGE;
+  priceRange?: PRICERANGE | null;
 }
 const fetchHairSalonBySlug = async (slug: string): Promise<HairSalonType> => {
   const hairSalon = await prisma.hairSalon.findUnique({
@@ -57,7 +57,7 @@ export default async function BarberDetails({
         <BarberNavbar slug={hairSalon.slug} />
         <Title name={hairSalon.name} />
         <Rating reviews={hairSalon.reviews} />
-        <Description description={hairSalon.description} />
+        <Description description={hairSalon.description || null} />
         <Images images={hairSalon.images} />
         <Reviews reviews={hairSalon.reviews} />
       </div>

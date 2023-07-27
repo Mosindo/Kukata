@@ -1,19 +1,18 @@
 import prisma from "../lib/prisma";
-import { HairSalon, QUEUESTATUS } from "@prisma/client";
+import { HairSalon } from "@prisma/client";
 
 interface QueueType {
-  id: number;
+  id: string;
   position: number;
-  hairSalonId: number;
+  hairSalonId: string;
   hairSalon: HairSalon;
   customerId: number;
   customer: Customer;
-  status: QUEUESTATUS;
   date: Date;
 }
 
 interface Customer {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   phoneNumber: string;
@@ -21,7 +20,7 @@ interface Customer {
   city?: string;
 }
 
-export async function createQueue(queueInput) {
+export async function createQueue(queueInput: QueueType) {
   const newQueue = await prisma.queue.create({
     data: {
       hairSalonId: queueInput.hairSalonId,

@@ -41,8 +41,6 @@ export default async function handler(
           closingTime,
           slug,
           priceRange,
-          firstName,
-          lastName,
           email,
           phoneNumber,
           location: {
