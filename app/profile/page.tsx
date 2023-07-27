@@ -1,4 +1,4 @@
-import { ProfileContent } from "./components/ProfileContent";
+import { ProfileContent } from "../components/ProfileContent";
 
 const profile = () => {
   return (

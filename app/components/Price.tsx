@@ -1,7 +1,7 @@
 import { PRICERANGE } from "@prisma/client";
 import React from "react";
 
-const Price = ({ price }: { price: PRICERANGE }) => {
+const Price = ({ price }: { price: PRICERANGE | null }) => {
   const renderPrice = () => {
     switch (price) {
       case PRICERANGE.CHEAP:

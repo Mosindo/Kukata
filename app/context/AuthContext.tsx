@@ -3,43 +3,10 @@
 import { useState, createContext, useEffect } from "react";
 import { USERCATEGORY } from "@prisma/client";
 import { supabase } from "../../lib/supabase";
+import { Session, User } from "@supabase/supabase-js";
 
-interface Customer {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  city: string;
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
-  role: USERCATEGORY;
-}
-interface Owner {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
-  role: USERCATEGORY;
-}
-interface Stylist {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email?: string;
-  phoneNumber?: string;
-  password?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  role: USERCATEGORY;
-}
 interface State {
-  data: Customer | Owner | Stylist | null;
+  data: User | null;
   loading: boolean;
   error: string | null;
 }
@@ -72,7 +39,6 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      console.log("session!!! :", session);
 
       if (!session) {
         return setAuthState({

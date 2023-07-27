@@ -1,3 +1,4 @@
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { USERCATEGORY } from "@prisma/client";
 import React from "react";
 
@@ -12,11 +13,11 @@ interface AuthModalInputsProps {
     role: USERCATEGORY;
   };
 
+  handleChangeInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
+
   // eslint-disable-next-line no-unused-vars
-  handleChangeInput: (
-    // eslint-disable-next-line no-unused-vars
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => void;
+  handleSelectChange: (e: SelectChangeEvent) => void;
+
   isSignin: boolean;
 }
 
@@ -29,22 +30,19 @@ const userCategories = {
 const AuthModalInputs = ({
   inputs,
   handleChangeInput,
+  handleSelectChange,
   isSignin,
 }: AuthModalInputsProps) => {
   return (
     <div>
       {isSignin ? null : (
-        <select
-          value={inputs.role}
-          onChange={handleChangeInput}
-          className="border rounded p-2 py-3 w-[49%]"
-        >
+        <Select value={inputs.role} name="role" onChange={handleSelectChange}>
           {Object.values(userCategories).map((category) => (
-            <option key={category} value={category}>
+            <MenuItem key={category} value={category}>
               {category.toLowerCase()}
-            </option>
+            </MenuItem>
           ))}
-        </select>
+        </Select>
       )}
       {isSignin ? null : (
         <div className="my-3 flex justify-between text-sm">
@@ -72,7 +70,9 @@ const AuthModalInputs = ({
           className="border rounded p-2 py-3 w-full"
           placeholder="Email"
           value={inputs.email}
-          onChange={handleChangeInput}
+          onChange={(e) => {
+            handleChangeInput(e as React.ChangeEvent<HTMLInputElement>);
+          }}
           name="email"
         />
       </div>

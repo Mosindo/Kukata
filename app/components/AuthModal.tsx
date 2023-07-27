@@ -6,7 +6,7 @@ import Modal from "@mui/material/Modal";
 import AuthModalInputs from "./AuthModalInputs";
 import useAuth from "../../hooks/useAuth";
 import { AuthenticationContext } from "../context/AuthContext";
-import { Alert, CircularProgress } from "@mui/material";
+import { Alert, CircularProgress, SelectChangeEvent } from "@mui/material";
 import { USERCATEGORY } from "@prisma/client";
 
 const style = {
@@ -26,20 +26,6 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const { signin, signup } = useAuth();
-
-  const renderContent = (signinContent: string, signupContent: string) => {
-    return isSignin ? signinContent : signupContent;
-  };
-
-  const handleChangeInput = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setInputs({
-      ...inputs,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   const [inputs, setInputs] = useState({
     firstName: "",
     lastName: "",
@@ -51,6 +37,24 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
   });
 
   const [disabled, setDisabled] = useState(true);
+  console.log("AuthModal.tsx: ", inputs);
+  const renderContent = (signinContent: string, signupContent: string) => {
+    return isSignin ? signinContent : signupContent;
+  };
+
+  const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputs({
+      ...inputs,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSelectChange = (e: SelectChangeEvent) => {
+    setInputs({
+      ...inputs,
+      [e.target.name as string]: e.target.value as USERCATEGORY,
+    });
+  };
 
   useEffect(() => {
     if (isSignin) {
@@ -125,6 +129,7 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
                 <AuthModalInputs
                   inputs={inputs}
                   handleChangeInput={handleChangeInput}
+                  handleSelectChange={handleSelectChange}
                   isSignin={isSignin}
                 />
                 <button

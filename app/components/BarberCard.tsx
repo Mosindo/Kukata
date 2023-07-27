@@ -13,7 +13,7 @@ const BarberCard = ({ hairSalon }: HairSalon) => {
     <div className="w-64 h-72 m-3 rounded overflow-hidden border cursor-pointer">
       <Link href={`/hairSalon/${hairSalon.slug}`}>
         <img
-          src={hairSalon.mainImage}
+          src={hairSalon.mainImage || undefined}
           alt=""
           className="w-full h-36"
           width={300}

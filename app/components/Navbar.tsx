@@ -13,6 +13,7 @@ const Navbar = () => {
   const { signout } = useAuth();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -21,7 +22,6 @@ const Navbar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   return (
     <nav className="bg-white p-2 flex justify-between">
       <Link
@@ -61,7 +61,9 @@ const Navbar = () => {
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
                   >
-                    <MenuItem onClick={handleClose}>Profile</MenuItem>
+                    <Link href={`/profile`}>
+                      <MenuItem onClick={handleClose}>Profile</MenuItem>
+                    </Link>
                     <MenuItem onClick={handleClose}>My account</MenuItem>
                     <MenuItem onClick={signout}>Sign out</MenuItem>
                   </Menu>

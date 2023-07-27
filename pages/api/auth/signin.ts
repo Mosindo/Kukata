@@ -1,11 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import validator from "validator";
-import { setCookie } from "cookies-next";
 import prisma from "../../../lib/prisma";
-import { Database } from "../../../lib/database.types";
-import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
 
 export default async function handler(
   req: NextApiRequest,
@@ -56,31 +51,6 @@ export default async function handler(
       },
     });
 
-    // if (!customer || !owner || !stylist) {
-    //   return res.status(401).json({
-    //     errorMessage: "Email or password is invalid",
-    //   });
-    // }
-
-    // const isMatch = await bcrypt.compare(password, customer.password);
-
-    // if (!isMatch) {
-    //   return res
-    //     .status(401)
-    //     .json({ errorMessage: "Email or password is invalid" });
-    // }
-
-    // const alg = "HS256";
-
-    // const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-
-    // const token = await new jose.SignJWT({ email: customer.email })
-    //   .setProtectedHeader({ alg })
-    //   .setExpirationTime("24h")
-    //   .sign(secret);
-    // const token = data.session?.access_token;
-    // console.log(data.session);
-    // setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
     if (customer) {
       return res.status(200).json({
         firstName: customer.firstName,

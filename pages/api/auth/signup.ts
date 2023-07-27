@@ -1,8 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import validator from "validator";
 import prisma from "../../../lib/prisma";
-import { setCookie } from "cookies-next";
-import { supabase } from "../../../lib/supabase";
 import { USERCATEGORY } from "@prisma/client";
 
 export default async function handler(
@@ -81,7 +79,6 @@ export default async function handler(
       return res.status(400).json({ errorMessage: "Email already exists" });
     }
 
-    // const hashedPassword = await bcrypt.hash(password, 10);
     if (role === USERCATEGORY.CUSTOMER) {
       const customer = await prisma.customer.create({
         data: {
@@ -95,16 +92,6 @@ export default async function handler(
         },
       });
 
-      // const alg = "HS256";
-
-      // const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-      // const token = await new jose.SignJWT({ email: customer.email })
-      //   .setProtectedHeader({ alg })
-      //   .setExpirationTime("24h")
-      //   .sign(secret);
-      const token = data.session?.access_token;
-
-      setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
       return res.status(200).json({
         firstName: customer.firstName,
         lastName: customer.lastName,
@@ -130,9 +117,6 @@ export default async function handler(
         },
       });
 
-      const token = data.session?.access_token;
-
-      setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
       return res.status(200).json({
         firstName: stylist.firstName,
         lastName: stylist.lastName,
@@ -151,9 +135,6 @@ export default async function handler(
         },
       });
 
-      const token = data.session?.access_token;
-
-      setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
       return res.status(200).json({
         firstName: owner.firstName,
         lastName: owner.lastName,
