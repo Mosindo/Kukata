@@ -18,5 +18,5 @@ module.exports = {
       "8xl": "80px",
     },
   },
-  plugins: [],
+  plugins: [require("daisyui")],
 };

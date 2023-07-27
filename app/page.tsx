@@ -2,7 +2,6 @@ import Header from "./components/Header";
 import BarberCard from "./components/BarberCard";
 import { Location, PRICERANGE, Review } from "@prisma/client";
 import prisma from "../lib/prisma";
-import { supabase } from "../lib/supabase";
 
 export interface HairSalonCardType {
   id: string;
