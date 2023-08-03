@@ -8,6 +8,10 @@ import useAuth from "../../hooks/useAuth";
 import { AuthenticationContext } from "../context/AuthContext";
 import { Alert, CircularProgress, SelectChangeEvent } from "@mui/material";
 import { USERCATEGORY } from "@prisma/client";
+import { Auth } from "@supabase/auth-ui-react";
+import { supabase } from "../../lib/supabase";
+import { useRouter } from "next/navigation";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 
 const style = {
   position: "absolute" as "absolute",
@@ -35,9 +39,18 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     phoneNumber: "",
     role: USERCATEGORY.CUSTOMER,
   });
+  const router = useRouter();
 
   const [disabled, setDisabled] = useState(true);
+
   console.log("AuthModal.tsx: ", inputs);
+  //maybe to remove
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT") {
+      router.push("/success");
+    }
+  });
+
   const renderContent = (signinContent: string, signupContent: string) => {
     return isSignin ? signinContent : signupContent;
   };
@@ -114,6 +127,7 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
                   {error}
                 </Alert>
               ) : null}
+
               <div className="uppercase font-bold text-center pb-2 border-bottom mb-2">
                 <p className="text-sm">
                   {renderContent("Sign In", "Create Account")}
@@ -140,6 +154,13 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
                   {renderContent("Sign In", "Create Account")}
                 </button>
               </div>
+              <hr className="my-5" />
+              <Auth
+                supabaseClient={supabase}
+                appearance={{ theme: ThemeSupa }}
+                providers={["google", "apple"]}
+                onlyThirdPartyProviders
+              />
             </div>
           )}
         </Box>

@@ -10,6 +10,7 @@ export const ProfileContent = () => {
 
   useEffect(() => {
     async function getUser() {
+      console.log("ProfileContent.tsx: ", data);
       try {
         if (data?.id) {
           setIsLoading(true);
