@@ -1,21 +1,20 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthenticationContext } from "../context/AuthContext";
-import { fetchCustomerByUserId } from "../../lib/helpers";
 
 export const ProfileContent = () => {
   const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { error, data, loading } = useContext(AuthenticationContext);
 
   useEffect(() => {
     async function getUser() {
-      console.log("ProfileContent.tsx: ", data);
       try {
         if (data?.id) {
           setIsLoading(true);
-          const res = await fetchCustomerByUserId(data?.id);
-          setUser(res);
+          if (error) setIsLoading(false);
+          setUser(data);
+          console.log("customer: ", data);
           setIsLoading(false);
         }
       } catch (error) {
@@ -27,8 +26,8 @@ export const ProfileContent = () => {
     if (data?.id) {
       getUser();
     }
-  }, [data?.id]);
-
+  }, [data, error]);
+  console.log("user: ", data);
   return (
     <div>
       <h1>ProfileContent</h1>

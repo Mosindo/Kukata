@@ -1,8 +1,9 @@
 import axios from "axios";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthenticationContext } from "../app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabase";
+import { USERCATEGORY } from "@prisma/client";
 
 const useAuth = () => {
   const { error, setAuthState } = useContext(AuthenticationContext);
@@ -145,11 +146,66 @@ const useAuth = () => {
       loading: false,
     });
   };
+  // Dans votre composant
+  const [selectedRole, setSelectedRole] = useState<USERCATEGORY | null>(null);
+
+  // Lorsque l'utilisateur sélectionne un rôle dans la modale
+  const handleRoleSelection = (role: USERCATEGORY) => {
+    setSelectedRole(role);
+    // Fermez la modale si nécessaire
+  };
+
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange(
+      async (event: string, session: any) => {
+        if (
+          event === "SIGNED_IN" &&
+          session.user.app_metadata.provider === "google"
+        ) {
+          if (selectedRole) {
+            handleGoogleSignIn(session.user, selectedRole);
+          } else {
+            // Affichez la modale de sélection de rôle ou définissez un rôle par défaut
+          }
+        }
+      }
+    );
+
+    return () => {
+      data.subscription.unsubscribe();
+    };
+  }, [selectedRole]);
+
+  // Dans votre hook useAuth
+  const handleGoogleSignIn = async (user: any, role: USERCATEGORY) => {
+    const userData = {
+      userId: user.id,
+      email: user.email,
+      firstName: user.user_metadata.name, // À remplir
+      lastName: "", // À remplir
+      role: role,
+      phoneNumber: user.phone,
+      city: user.user_metadata.city,
+    };
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/users",
+        userData
+      );
+
+      console.log("handlegoogleSignin:", response.data);
+    } catch (error) {
+      console.error("Failed to create user:", error);
+    }
+  };
 
   return {
     signin,
     signup,
     signout,
+    selectedRole,
+    handleRoleSelection,
+    handleGoogleSignIn,
   };
 };
 

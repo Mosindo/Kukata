@@ -10,7 +10,6 @@ import { Alert, CircularProgress, SelectChangeEvent } from "@mui/material";
 import { USERCATEGORY } from "@prisma/client";
 import { Auth } from "@supabase/auth-ui-react";
 import { supabase } from "../../lib/supabase";
-import { useRouter } from "next/navigation";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 
 const style = {
@@ -39,17 +38,8 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     phoneNumber: "",
     role: USERCATEGORY.CUSTOMER,
   });
-  const router = useRouter();
 
   const [disabled, setDisabled] = useState(true);
-
-  console.log("AuthModal.tsx: ", inputs);
-  //maybe to remove
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === "SIGNED_OUT") {
-      router.push("/success");
-    }
-  });
 
   const renderContent = (signinContent: string, signupContent: string) => {
     return isSignin ? signinContent : signupContent;
