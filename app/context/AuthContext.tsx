@@ -2,7 +2,7 @@
 
 import { useState, createContext, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
-import { Session, User } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 
 interface State {
   data: User | null;
@@ -47,53 +47,11 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
         });
       }
 
-      const userId = session.user.id;
-      let userData;
-
-      // Check in 'customer' table
-      const { data: customerData } = await supabase
-        .from("Customer")
-        .select("*")
-        .eq("id", userId);
-      if (customerData && customerData.length > 0) {
-        userData = customerData[0];
-      }
-
-      // Check in 'owner' table if not found in 'customer'
-      if (!userData) {
-        const { data: ownerData } = await supabase
-          .from("Owner")
-          .select("*")
-          .eq("id", userId);
-        if (ownerData && ownerData.length > 0) {
-          userData = ownerData[0];
-        }
-      }
-
-      // Check in 'stylist' table if not found in 'customer' and 'owner'
-      if (!userData) {
-        const { data: stylistData } = await supabase
-          .from("Stylist")
-          .select("*")
-          .eq("id", userId);
-        if (stylistData && stylistData.length > 0) {
-          userData = stylistData[0];
-        }
-      }
-
-      if (userData) {
-        setAuthState({
-          data: userData,
-          error: null,
-          loading: false,
-        });
-      } else {
-        setAuthState({
-          data: null,
-          error: "User not found",
-          loading: false,
-        });
-      }
+      setAuthState({
+        data: session.user as any,
+        error: null,
+        loading: false,
+      });
     } catch (error: any) {
       setAuthState({
         data: null,
@@ -106,7 +64,6 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     fetchUser();
   }, []);
-
   return (
     <AuthenticationContext.Provider value={{ ...AuthState, setAuthState }}>
       {children}
