@@ -6,32 +6,27 @@ export const ProfileContent = () => {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { error, data, loading } = useContext(AuthenticationContext);
-
+  console.log("data", loading);
   useEffect(() => {
     async function getUser() {
       try {
         if (data?.id) {
-          setIsLoading(true);
-          if (error) setIsLoading(false);
           setUser(data);
-          console.log("customer: ", data);
-          setIsLoading(false);
         }
       } catch (error) {
         console.error("Error:", error);
-        setIsLoading(false);
       }
     }
 
     if (data?.id) {
       getUser();
     }
-  }, [data, error]);
-  console.log("user: ", data);
+  }, [data, error, loading]);
+
   return (
     <div>
       <h1>ProfileContent</h1>
-      {isLoading ? (
+      {loading ? (
         <span className="loading loading-spinner text-success"></span>
       ) : (
         <>

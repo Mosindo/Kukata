@@ -51,7 +51,6 @@ const useAuth = () => {
         error: null,
         loading: false,
       });
-      router.refresh();
       handleClose();
       router.refresh();
     } catch (error: any) {
