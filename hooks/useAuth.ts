@@ -61,6 +61,7 @@ const useAuth = () => {
       });
     }
   };
+
   const signup = async (
     {
       email,
@@ -138,15 +139,15 @@ const useAuth = () => {
 
   const signout = async () => {
     await supabase.auth.signOut();
-    router.refresh();
     setAuthState({
       data: null,
       error: null,
       loading: false,
     });
+    router.refresh();
   };
   // Dans votre composant
-  const [selectedRole, setSelectedRole] = useState<USERCATEGORY | null>(null);
+  const [selectedRole, setSelectedRole] = useState<USERCATEGORY>("CUSTOMER");
 
   // Lorsque l'utilisateur sélectionne un rôle dans la modale
   const handleRoleSelection = (role: USERCATEGORY) => {
@@ -161,11 +162,8 @@ const useAuth = () => {
           event === "SIGNED_IN" &&
           session.user.app_metadata.provider === "google"
         ) {
-          if (selectedRole) {
-            handleGoogleSignIn(session.user, selectedRole);
-          } else {
-            // Affichez la modale de sélection de rôle ou définissez un rôle par défaut
-          }
+          console.log("session:", selectedRole);
+          googleSignIn(session.user, selectedRole);
         }
       }
     );
@@ -176,19 +174,18 @@ const useAuth = () => {
   }, [selectedRole]);
 
   // Dans votre hook useAuth
-  const handleGoogleSignIn = async (user: any, role: USERCATEGORY) => {
+  const googleSignIn = async (user: any, role: USERCATEGORY) => {
     const userData = {
       userId: user.id,
       email: user.email,
-      firstName: user.user_metadata.name, // À remplir
-      lastName: "", // À remplir
+      firstName: user.user_metadata.name,
+      lastName: "",
       role: role,
       phoneNumber: user.phone,
-      city: user.user_metadata.city,
     };
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/users",
+        `http://localhost:3000/api/${role.toLowerCase()}`,
         userData
       );
 
@@ -204,7 +201,7 @@ const useAuth = () => {
     signout,
     selectedRole,
     handleRoleSelection,
-    handleGoogleSignIn,
+    googleSignIn,
   };
 };
 

@@ -8,9 +8,7 @@ import useAuth from "../../hooks/useAuth";
 import { AuthenticationContext } from "../context/AuthContext";
 import { Alert, CircularProgress, SelectChangeEvent } from "@mui/material";
 import { USERCATEGORY } from "@prisma/client";
-import { Auth } from "@supabase/auth-ui-react";
 import { supabase } from "../../lib/supabase";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
 
 const style = {
   position: "absolute" as "absolute",
@@ -28,7 +26,7 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const { signin, signup } = useAuth();
+  const { signin, signup, handleRoleSelection, selectedRole } = useAuth();
   const [inputs, setInputs] = useState({
     firstName: "",
     lastName: "",
@@ -78,7 +76,7 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     }
 
     setDisabled(true);
-  }, [inputs]);
+  }, [inputs, isSignin]);
 
   const handleClick = () => {
     if (isSignin) {
@@ -88,6 +86,16 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     }
   };
 
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const role = e.target.value as USERCATEGORY;
+    handleRoleSelection(role);
+    console.log("Selected role:", role);
+  };
+  const handleGoogleSignIn = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+  };
   return (
     <div>
       <button
@@ -145,12 +153,13 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
                 </button>
               </div>
               <hr className="my-5" />
-              <Auth
-                supabaseClient={supabase}
-                appearance={{ theme: ThemeSupa }}
-                providers={["google", "apple"]}
-                onlyThirdPartyProviders
-              />
+              <select onChange={handleRoleChange} value={selectedRole}>
+                <option value={USERCATEGORY.CUSTOMER}>Customer</option>
+                <option value={USERCATEGORY.OWNER}>Owner</option>
+              </select>
+              <button onClick={handleGoogleSignIn}>
+                Se connecter avec Google
+              </button>
             </div>
           )}
         </Box>

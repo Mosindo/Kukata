@@ -4,7 +4,6 @@ import { AuthenticationContext } from "../context/AuthContext";
 
 export const ProfileContent = () => {
   const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { error, data, loading } = useContext(AuthenticationContext);
   console.log("data", loading);
   useEffect(() => {
@@ -22,6 +21,7 @@ export const ProfileContent = () => {
       getUser();
     }
   }, [data, error, loading]);
+  console.log("user", user);
 
   return (
     <div>

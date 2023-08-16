@@ -33,8 +33,8 @@ model HairSalon {
 
 model Owner {
   id          String       @id @default(cuid())
-  firstName   String
-  lastName    String
+  firstName   String?
+  lastName    String?
   email       String       @unique
   userId      String?      @unique
   createdAt   DateTime     @default(now())
@@ -46,8 +46,8 @@ model Owner {
 
 model Stylist {
   id          String       @id @default(cuid())
-  firstName   String
-  lastName    String
+  firstName   String?
+  lastName    String?
   phoneNumber String?
   email       String?      @unique
   images      String[]
@@ -62,7 +62,7 @@ model Stylist {
 model Customer {
   id          String       @id @default(cuid())
   firstName   String
-  lastName    String
+  lastName    String?
   phoneNumber String
   email       String       @unique
   city        String?
