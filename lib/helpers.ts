@@ -40,10 +40,10 @@ export const fetchCustomerByUserId = async (
 };
 
 export const validateRequestBodyFields = (
-  req: NextApiRequest,
+  req: Request,
   validFields: string[]
 ) => {
-  const keys = Object.keys(req.body);
+  const keys = Object.keys(req.json);
   for (let key of keys) {
     if (!validFields.includes(key)) {
       return { isValid: false, invalidField: key };
