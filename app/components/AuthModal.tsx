@@ -22,11 +22,12 @@ const style = {
 };
 
 const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
-  const { error, loading } = useContext(AuthenticationContext);
+  const { error, loading, data } = useContext(AuthenticationContext);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const { signin, signup, handleRoleSelection, selectedRole } = useAuth();
+  const { signin, signup, handleRoleSelection, selectedRole, googleSignIn } =
+    useAuth();
   const [inputs, setInputs] = useState({
     firstName: "",
     lastName: "",
@@ -91,11 +92,99 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     handleRoleSelection(role);
     console.log("Selected role:", role);
   };
+
   const handleGoogleSignIn = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
     });
+    console.log("data", data);
+    await googleSignIn(data, "CUSTOMER");
+    // if (error) {
+    //   console.error(error);
+    // } else if (data.session !== null) {
+    //   // Set the cookie options
+    //   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week from now
+    //   data.session.expires_at = expiresAt.getTime();
+    //   await supabase.auth.setSession(data.session);
+
+    //   console.log("User details:", data);
+
+    //   // Create the corresponding user in your database
+    //   const { data: ownerData, error: ownerError } = await supabase
+    //     .from("Owner")
+    //     .insert({ email: user.email })
+    //     .single();
+
+    //   if (ownerError) {
+    //     console.error(ownerError);
+    //   } else {
+    //     console.log("Owner details:", ownerData);
+    //   }
+
+    //   const { data: stylistData, error: stylistError } = await supabase
+    //     .from("Stylist")
+    //     .insert({ email: user.email })
+    //     .single();
+
+    //   if (stylistError) {
+    //     console.error(stylistError);
+    //   } else {
+    //     console.log("Stylist details:", stylistData);
+    //   }
+
+    //   const { data: customerData, error: customerError } = await supabase
+    //     .from("Customer")
+    //     .insert({ email: user.email })
+    //     .single();
+
+    //   if (customerError) {
+    //     console.error(customerError);
+    //   } else {
+    //     console.log("Customer details:", customerData);
+    //   }
+    // }
   };
+
+  // Listen for changes in the authentication state
+  // supabase.auth.onAuthStateChange((event, session) => {
+  //   if (event === "SIGNED_IN") {
+  //     // Create the corresponding user in your database
+  //     const { user } = session;
+  //     const { data: ownerData, error: ownerError } = await supabase
+  //       .from("Owner")
+  //       .insert({ email: user.email })
+  //       .single();
+
+  //     if (ownerError) {
+  //       console.error(ownerError);
+  //     } else {
+  //       console.log("Owner details:", ownerData);
+  //     }
+
+  //     const { data: stylistData, error: stylistError } = await supabase
+  //       .from("Stylist")
+  //       .insert({ email: user.email })
+  //       .single();
+
+  //     if (stylistError) {
+  //       console.error(stylistError);
+  //     } else {
+  //       console.log("Stylist details:", stylistData);
+  //     }
+
+  //     const { data: customerData, error: customerError } = await supabase
+  //       .from("Customer")
+  //       .insert({ email: user.email })
+  //       .single();
+
+  //     if (customerError) {
+  //       console.error(customerError);
+  //     } else {
+  //       console.log("Customer details:", customerData);
+  //     }
+  //   }
+  // });
+
   return (
     <div>
       <button

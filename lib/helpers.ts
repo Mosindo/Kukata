@@ -1,5 +1,3 @@
-import { NextApiRequest } from "next";
-
 import axios from "axios";
 
 interface CustomerType {

@@ -1,4 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../../lib/prisma";
 import { validateRequestBodyFields } from "../../../../lib/helpers";
 import { NextResponse } from "next/server";

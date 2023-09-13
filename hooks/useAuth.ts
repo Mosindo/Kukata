@@ -33,8 +33,14 @@ const useAuth = () => {
       );
 
       if (errorAuth) {
-        console.error("Error creating Supabase user:", errorAuth);
-        throw errorAuth;
+        console.error(errorAuth);
+      } else if (data.session !== null) {
+        // Set the cookie options
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week from now
+        data.session.expires_at = expiresAt.getTime();
+        await supabase.auth.setSession(data.session);
+
+        console.log("User details:", data.user);
       }
 
       const response = await axios.post(
@@ -102,6 +108,13 @@ const useAuth = () => {
       if (errorAuth) {
         console.error("Error creating Supabase user:", errorAuth);
         throw errorAuth;
+      } else if (data.session !== null) {
+        // Set the cookie options
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week from now
+        data.session.expires_at = expiresAt.getTime();
+        await supabase.auth.setSession(data.session);
+
+        console.log("User details:", data.user);
       }
       router.refresh();
       const response = await axios.post(
@@ -144,7 +157,7 @@ const useAuth = () => {
       error: null,
       loading: false,
     });
-    router.refresh();
+    router.push("/");
   };
   // Dans votre composant
   const [selectedRole, setSelectedRole] = useState<USERCATEGORY>("CUSTOMER");
@@ -158,12 +171,13 @@ const useAuth = () => {
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange(
       async (event: string, session: any) => {
+        console.log("event:", event);
         if (
           event === "SIGNED_IN" &&
           session.user.app_metadata.provider === "google"
         ) {
           console.log("session:", selectedRole);
-          googleSignIn(session.user, selectedRole);
+          // googleSignIn(session.user, selectedRole);
         }
       }
     );
