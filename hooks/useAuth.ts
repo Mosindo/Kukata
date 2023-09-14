@@ -93,6 +93,7 @@ const useAuth = () => {
       error: null,
       loading: true,
     });
+
     try {
       const { data, error: errorAuth } = await supabase.auth.signUp({
         email,
@@ -127,7 +128,7 @@ const useAuth = () => {
           city,
           phoneNumber,
           role,
-          data,
+          userId: data?.user?.id,
         }
       );
 
@@ -161,6 +162,7 @@ const useAuth = () => {
   };
   // Dans votre composant
   const [selectedRole, setSelectedRole] = useState<USERCATEGORY>("CUSTOMER");
+  const [user, setUser] = useState();
 
   // Lorsque l'utilisateur sélectionne un rôle dans la modale
   const handleRoleSelection = (role: USERCATEGORY) => {
@@ -171,13 +173,14 @@ const useAuth = () => {
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange(
       async (event: string, session: any) => {
-        console.log("event:", event);
         if (
           event === "SIGNED_IN" &&
           session.user.app_metadata.provider === "google"
         ) {
-          console.log("session:", selectedRole);
-          // googleSignIn(session.user, selectedRole);
+          const { user } = session;
+          console.log("user:", user);
+          // Create a profile for the user
+          googleSignup(user);
         }
       }
     );
@@ -188,7 +191,9 @@ const useAuth = () => {
   }, [selectedRole]);
 
   // Dans votre hook useAuth
-  const googleSignIn = async (user: any, role: USERCATEGORY) => {
+  const googleSignup = async (user: any) => {
+    const storedRole = localStorage.getItem("selectedRole") as USERCATEGORY;
+    const role = storedRole ? storedRole : USERCATEGORY.CUSTOMER;
     const userData = {
       userId: user.id,
       email: user.email,
@@ -197,6 +202,7 @@ const useAuth = () => {
       role: role,
       phoneNumber: user.phone,
     };
+    console.log("googleSignIn role:", role);
     try {
       const response = await axios.post(
         `http://localhost:3000/api/${role.toLowerCase()}`,
@@ -215,7 +221,8 @@ const useAuth = () => {
     signout,
     selectedRole,
     handleRoleSelection,
-    googleSignIn,
+    user,
+    setSelectedRole,
   };
 };
 

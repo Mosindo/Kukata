@@ -9,14 +9,11 @@ export const supabase = createClient<Database>(
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
   {
-    auth: { persistSession: false },
+    auth: { persistSession: false, autoRefreshToken: false },
   }
 );
+const admin = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false },
+});
 
-export const supabaseAdmin = createClient<Database>(
-  SUPABASE_URL,
-  SUPABASE_SERVICE_KEY,
-  {
-    auth: { persistSession: false },
-  }
-);
+export const supabaseAdmin = admin;

@@ -10,6 +10,12 @@ import { Alert, CircularProgress, SelectChangeEvent } from "@mui/material";
 import { USERCATEGORY } from "@prisma/client";
 import { supabase } from "../../lib/supabase";
 
+type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
+type MUISelectChangeEvent = React.ChangeEvent<{
+  name?: string;
+  value: unknown;
+}>;
+
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -22,12 +28,11 @@ const style = {
 };
 
 const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
-  const { error, loading, data } = useContext(AuthenticationContext);
+  const { error, loading } = useContext(AuthenticationContext);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const { signin, signup, handleRoleSelection, selectedRole, googleSignIn } =
-    useAuth();
+  const { signin, signup } = useAuth();
   const [inputs, setInputs] = useState({
     firstName: "",
     lastName: "",
@@ -37,25 +42,23 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     phoneNumber: "",
     role: USERCATEGORY.CUSTOMER,
   });
-
+  const [selectedRole, setSelectedRole] = useState<USERCATEGORY>("CUSTOMER");
   const [disabled, setDisabled] = useState(true);
 
   const renderContent = (signinContent: string, signupContent: string) => {
     return isSignin ? signinContent : signupContent;
   };
 
-  const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputs({
-      ...inputs,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSelectChange = (e: SelectChangeEvent) => {
-    setInputs({
-      ...inputs,
-      [e.target.name as string]: e.target.value as USERCATEGORY,
-    });
+  const handleInputChange = (e: InputChangeEvent | MUISelectChangeEvent) => {
+    const { name, value } = e.target as
+      | HTMLInputElement
+      | { name?: string; value: unknown };
+    if (name) {
+      setInputs((prevInputs) => ({
+        ...prevInputs,
+        [name]: value,
+      }));
+    }
   };
 
   useEffect(() => {
@@ -87,103 +90,26 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     }
   };
 
-  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const role = e.target.value as USERCATEGORY;
-    handleRoleSelection(role);
-    console.log("Selected role:", role);
-  };
-
   const handleGoogleSignIn = async () => {
+    localStorage.setItem("selectedRole", selectedRole);
     await supabase.auth.signInWithOAuth({
       provider: "google",
     });
-    console.log("data", data);
-    await googleSignIn(data, "CUSTOMER");
-    // if (error) {
-    //   console.error(error);
-    // } else if (data.session !== null) {
-    //   // Set the cookie options
-    //   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week from now
-    //   data.session.expires_at = expiresAt.getTime();
-    //   await supabase.auth.setSession(data.session);
-
-    //   console.log("User details:", data);
-
-    //   // Create the corresponding user in your database
-    //   const { data: ownerData, error: ownerError } = await supabase
-    //     .from("Owner")
-    //     .insert({ email: user.email })
-    //     .single();
-
-    //   if (ownerError) {
-    //     console.error(ownerError);
-    //   } else {
-    //     console.log("Owner details:", ownerData);
-    //   }
-
-    //   const { data: stylistData, error: stylistError } = await supabase
-    //     .from("Stylist")
-    //     .insert({ email: user.email })
-    //     .single();
-
-    //   if (stylistError) {
-    //     console.error(stylistError);
-    //   } else {
-    //     console.log("Stylist details:", stylistData);
-    //   }
-
-    //   const { data: customerData, error: customerError } = await supabase
-    //     .from("Customer")
-    //     .insert({ email: user.email })
-    //     .single();
-
-    //   if (customerError) {
-    //     console.error(customerError);
-    //   } else {
-    //     console.log("Customer details:", customerData);
-    //   }
-    // }
   };
 
-  // Listen for changes in the authentication state
-  // supabase.auth.onAuthStateChange((event, session) => {
-  //   if (event === "SIGNED_IN") {
-  //     // Create the corresponding user in your database
-  //     const { user } = session;
-  //     const { data: ownerData, error: ownerError } = await supabase
-  //       .from("Owner")
-  //       .insert({ email: user.email })
-  //       .single();
+  useEffect(() => {
+    setSelectedRole(inputs.role);
+    localStorage.setItem("selectedRole", selectedRole);
+    console.log("selectedRole in useeffect:", selectedRole);
+  }, [selectedRole, inputs]);
 
-  //     if (ownerError) {
-  //       console.error(ownerError);
-  //     } else {
-  //       console.log("Owner details:", ownerData);
-  //     }
-
-  //     const { data: stylistData, error: stylistError } = await supabase
-  //       .from("Stylist")
-  //       .insert({ email: user.email })
-  //       .single();
-
-  //     if (stylistError) {
-  //       console.error(stylistError);
-  //     } else {
-  //       console.log("Stylist details:", stylistData);
-  //     }
-
-  //     const { data: customerData, error: customerError } = await supabase
-  //       .from("Customer")
-  //       .insert({ email: user.email })
-  //       .single();
-
-  //     if (customerError) {
-  //       console.error(customerError);
-  //     } else {
-  //       console.log("Customer details:", customerData);
-  //     }
-  //   }
-  // });
+  useEffect(() => {
+    const storedRole = localStorage.getItem("selectedRole");
+    if (storedRole) {
+      setSelectedRole(storedRole as USERCATEGORY);
+      localStorage.removeItem("selectedRole"); // Nettoyer après utilisation
+    }
+  }, []);
 
   return (
     <div>
@@ -229,8 +155,7 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
                 </h2>
                 <AuthModalInputs
                   inputs={inputs}
-                  handleChangeInput={handleChangeInput}
-                  handleSelectChange={handleSelectChange}
+                  handleInputChange={handleInputChange}
                   isSignin={isSignin}
                 />
                 <button
@@ -242,10 +167,6 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
                 </button>
               </div>
               <hr className="my-5" />
-              <select onChange={handleRoleChange} value={selectedRole}>
-                <option value={USERCATEGORY.CUSTOMER}>Customer</option>
-                <option value={USERCATEGORY.OWNER}>Owner</option>
-              </select>
               <button onClick={handleGoogleSignIn}>
                 Se connecter avec Google
               </button>

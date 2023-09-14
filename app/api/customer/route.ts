@@ -66,31 +66,28 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const data = await req.json();
-  const { id, firstName, lastName, email, phoneNumber, city, userId } = data;
-  if (req.method === "POST" && userId) {
-    try {
-      const customerData = {
-        id,
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        city,
-        userId,
-      };
+  const { userId, firstName, lastName, email, phoneNumber, city } = data;
+  try {
+    const customerData = {
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      city,
+      userId,
+    };
 
-      const customer = await prisma.customer.create({
-        data: customerData,
-      });
+    const customer = await prisma.customer.create({
+      data: data,
+    });
 
-      return NextResponse.json(customer, {
-        status: 201,
-      });
-    } catch (error) {
-      console.error(error);
-      return NextResponse.json("Internal Server Error", {
-        status: 500,
-      });
-    }
+    return NextResponse.json(customer, {
+      status: 201,
+    });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json("Internal Server Error", {
+      status: 500,
+    });
   }
 }

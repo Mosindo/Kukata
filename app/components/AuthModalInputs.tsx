@@ -2,6 +2,13 @@ import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { USERCATEGORY } from "@prisma/client";
 import React from "react";
 
+type MUISelectChangeEvent = React.ChangeEvent<{
+  name?: string;
+  value: unknown;
+}> & {
+  target: { value: USERCATEGORY };
+};
+type InputChangeEvent = React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
 interface AuthModalInputsProps {
   inputs: {
     firstName: string;
@@ -13,10 +20,8 @@ interface AuthModalInputsProps {
     role: USERCATEGORY;
   };
 
-  handleChangeInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
-
   // eslint-disable-next-line no-unused-vars
-  handleSelectChange: (e: SelectChangeEvent) => void;
+  handleInputChange: (e: InputChangeEvent | MUISelectChangeEvent) => void;
 
   isSignin: boolean;
 }
@@ -29,14 +34,18 @@ const userCategories = {
 
 const AuthModalInputs = ({
   inputs,
-  handleChangeInput,
-  handleSelectChange,
+  handleInputChange,
   isSignin,
 }: AuthModalInputsProps) => {
+  console.log("inputs:", inputs);
   return (
     <div>
       {isSignin ? null : (
-        <Select value={inputs.role} name="role" onChange={handleSelectChange}>
+        <Select
+          value={inputs.role}
+          name="role"
+          onChange={handleInputChange as any}
+        >
           {Object.values(userCategories).map((category) => (
             <MenuItem key={category} value={category}>
               {category.toLowerCase()}
@@ -51,7 +60,7 @@ const AuthModalInputs = ({
             className="border rounded p-2 py-3 w-[49%]"
             placeholder="First Name"
             value={inputs.firstName}
-            onChange={handleChangeInput}
+            onChange={handleInputChange}
             name="firstName"
           />
           <input
@@ -59,7 +68,7 @@ const AuthModalInputs = ({
             className="border rounded p-2 py-3 w-[49%]"
             placeholder="Last Name"
             value={inputs.lastName}
-            onChange={handleChangeInput}
+            onChange={handleInputChange}
             name="lastName"
           />
         </div>
@@ -70,9 +79,7 @@ const AuthModalInputs = ({
           className="border rounded p-2 py-3 w-full"
           placeholder="Email"
           value={inputs.email}
-          onChange={(e) => {
-            handleChangeInput(e as React.ChangeEvent<HTMLInputElement>);
-          }}
+          onChange={handleInputChange}
           name="email"
         />
       </div>
@@ -83,7 +90,7 @@ const AuthModalInputs = ({
             className="border rounded p-2 py-3 w-[49%]"
             placeholder="Phone"
             value={inputs.phoneNumber}
-            onChange={handleChangeInput}
+            onChange={handleInputChange}
             name="phoneNumber"
           />
           <input
@@ -91,7 +98,7 @@ const AuthModalInputs = ({
             className="border rounded p-2 py-3 w-[49%]"
             placeholder="City"
             value={inputs.city}
-            onChange={handleChangeInput}
+            onChange={handleInputChange}
             name="city"
           />
         </div>
@@ -102,7 +109,7 @@ const AuthModalInputs = ({
           className="border rounded p-2 py-3 w-full"
           placeholder="Password"
           value={inputs.password}
-          onChange={handleChangeInput}
+          onChange={handleInputChange}
           name="password"
         />
       </div>
