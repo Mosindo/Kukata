@@ -13,14 +13,6 @@ export default async function handler(
     // Delete user from Supabase
     const { error } = await supabase.auth.admin.deleteUser(userId);
 
-    // if (error) {
-    //   console.error("Error deleting user from Supabase:", error);
-    //   return res
-    //     .status(500)
-    //     .json({ error: "Error deleting user from Supabase." });
-    // }
-
-    // Delete related data from Prisma based on user role
     switch (role) {
       case "CUSTOMER":
         await prisma.customer.delete({

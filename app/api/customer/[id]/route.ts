@@ -1,6 +1,7 @@
 import prisma from "../../../../lib/prisma";
 import { validateRequestBodyFields } from "../../../../lib/helpers";
 import { NextResponse } from "next/server";
+import { supabase, supabaseAdmin } from "../../../../lib/supabase";
 
 // export default async function handler(
 //   req: NextApiRequest,
@@ -159,12 +160,19 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   const id = req.url.slice(req.url.lastIndexOf("/") + 1);
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
+  if (error) {
+    console.error("Error creating Supabase user:", error);
+    return NextResponse.json("Internal Server Error", { status: 500 });
+  }
+
   try {
     const customer = await prisma.customer.delete({
       where: {
-        id: id,
+        userId: id,
       },
     });
+
     return NextResponse.json(customer, { status: 200 });
   } catch (error) {
     console.error(error);
