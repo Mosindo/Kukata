@@ -118,6 +118,8 @@ const useAuth = () => {
         console.log("User details:", data.user);
       }
       router.refresh();
+      const storedRole = localStorage.getItem("selectedRole") as USERCATEGORY;
+      const role = storedRole ? storedRole : USERCATEGORY.CUSTOMER;
       const response = await axios.post(
         "http://localhost:3000/api/auth/signup",
         {
@@ -141,6 +143,7 @@ const useAuth = () => {
       if (!error) {
         handleClose();
       }
+      localStorage.removeItem("selectedRole");
       router.refresh();
     } catch (error: any) {
       setAuthState({
@@ -208,7 +211,7 @@ const useAuth = () => {
         `http://localhost:3000/api/${role.toLowerCase()}`,
         userData
       );
-
+      localStorage.removeItem("selectedRole");
       console.log("handlegoogleSignin:", response.data);
     } catch (error) {
       console.error("Failed to create user:", error);
