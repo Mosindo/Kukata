@@ -153,6 +153,7 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
                     "Create Your Kukata Account"
                   )}
                 </h2>
+
                 <AuthModalInputs
                   inputs={inputs}
                   handleInputChange={handleInputChange}

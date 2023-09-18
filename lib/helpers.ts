@@ -1,4 +1,22 @@
 import axios from "axios";
+import { USERCATEGORY } from "@prisma/client";
+
+export interface FormData {
+  role: string | USERCATEGORY;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+  city: string;
+}
+
+export interface StepProps {
+  nextStep: () => void;
+  prevStep?: () => void;
+  handleChange: (input: string, value: string) => void;
+  values?: FormData;
+}
 
 interface CustomerType {
   id: string;

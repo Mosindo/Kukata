@@ -1,6 +1,7 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthenticationContext } from "../context/AuthContext";
+import MultiStepAuthModal from "./multistepAuth/MultiStepAuthModal";
 
 export const ProfileContent = () => {
   const [user, setUser] = useState<any>(null);
@@ -38,6 +39,7 @@ export const ProfileContent = () => {
           <p>{user?.role}</p>
           <hr />
           <p>Use the choose file button below to upload</p>
+          <MultiStepAuthModal />
         </>
       )}
     </div>
