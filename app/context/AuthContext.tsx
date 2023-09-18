@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, createContext, useEffect } from "react";
-import { supabase } from "../../lib/supabase";
+
 import { User } from "@supabase/supabase-js";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Database } from "../../lib/database.types";
 
 interface State {
   data: User | null;
@@ -27,7 +29,7 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
     loading: true,
     error: null,
   });
-
+  const supabase = createClientComponentClient<Database>();
   const fetchUser = async () => {
     setAuthState({
       data: null,
@@ -55,7 +57,7 @@ const AuthContext = ({ children }: { children: React.ReactNode }) => {
     } catch (error: any) {
       setAuthState({
         data: null,
-        error: error.response.data.errorMessage,
+        error: error.response?.data.errorMessage,
         loading: false,
       });
     }

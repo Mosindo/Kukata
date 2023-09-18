@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   try {
     const stylist = await prisma.stylist.findUnique({
       where: {
-        id: id,
+        userId: id,
       },
     });
     return NextResponse.json(stylist, { status: 200 });

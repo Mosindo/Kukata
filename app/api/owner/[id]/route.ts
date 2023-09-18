@@ -106,7 +106,7 @@ export async function GET(req: Request) {
   try {
     const owner = await prisma.owner.findUnique({
       where: {
-        id: id,
+        userId: id,
       },
     });
     return NextResponse.json(owner, { status: 200 });

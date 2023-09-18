@@ -37,7 +37,6 @@ const AuthModalInputs = ({
   handleInputChange,
   isSignin,
 }: AuthModalInputsProps) => {
-  console.log("inputs:", inputs);
   return (
     <div>
       {isSignin ? null : (

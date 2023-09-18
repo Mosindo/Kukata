@@ -2,7 +2,11 @@ import { PRICERANGE, USERCATEGORY } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../lib/prisma";
 import { fakerFR as faker } from "@faker-js/faker";
-import { supabase } from "../../../lib/supabase";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { Database } from "../../../lib/database.types";
+import { cookies } from "next/headers";
+
+const supabase = createRouteHandlerClient<Database>({ cookies });
 
 const PASSWORD = "MDP12345*!";
 function generateUniqueEmail() {
@@ -163,7 +167,6 @@ const deleteAllUsers = async () => {
       data: { users },
       error,
     } = await supabase.auth.admin.listUsers({ page, perPage });
-    console.log("users", users);
 
     if (error) {
       console.error("Error fetching users from Supabase:", error);

@@ -74,25 +74,16 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
-  const { userId } = await req.json();
-
-  if (!userId) {
-    return NextResponse.json(
-      { error: "User ID is required." },
-      { status: 400 }
-    );
-  }
-
+export async function GET() {
+  const owner = await prisma.owner.findMany();
   try {
-    const owners = await prisma.owner.findMany({
-      where: {
-        userId: userId,
-      },
+    return NextResponse.json(owner, {
+      status: 200,
     });
-    return NextResponse.json(owners, { status: 200 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json("Internal Server Error", { status: 500 });
+    return NextResponse.json("Internal Server Error", {
+      status: 500,
+    });
   }
 }

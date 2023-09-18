@@ -6,7 +6,7 @@ import MultiStepAuthModal from "./multistepAuth/MultiStepAuthModal";
 export const ProfileContent = () => {
   const [user, setUser] = useState<any>(null);
   const { error, data, loading } = useContext(AuthenticationContext);
-  console.log("data", loading);
+
   useEffect(() => {
     async function getUser() {
       try {
@@ -22,7 +22,6 @@ export const ProfileContent = () => {
       getUser();
     }
   }, [data, error, loading]);
-  console.log("user", user);
 
   return (
     <div>

@@ -1,7 +1,7 @@
 import prisma from "../../../../lib/prisma";
 import { validateRequestBodyFields } from "../../../../lib/helpers";
 import { NextResponse } from "next/server";
-import { supabase, supabaseAdmin } from "../../../../lib/supabase";
+import { supabaseAdmin } from "../../../../lib/supabase";
 
 // export default async function handler(
 //   req: NextApiRequest,
@@ -98,7 +98,7 @@ export async function GET(req: Request) {
   try {
     const customer = await prisma.customer.findUnique({
       where: {
-        id: id,
+        userId: id,
       },
     });
     return NextResponse.json(customer, { status: 200 });

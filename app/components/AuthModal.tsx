@@ -6,9 +6,10 @@ import Modal from "@mui/material/Modal";
 import AuthModalInputs from "./AuthModalInputs";
 import useAuth from "../../hooks/useAuth";
 import { AuthenticationContext } from "../context/AuthContext";
-import { Alert, CircularProgress, SelectChangeEvent } from "@mui/material";
+import { Alert, CircularProgress } from "@mui/material";
 import { USERCATEGORY } from "@prisma/client";
-import { supabase } from "../../lib/supabase";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Database } from "../../lib/database.types";
 
 type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 type MUISelectChangeEvent = React.ChangeEvent<{
@@ -44,6 +45,8 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
   });
   const [selectedRole, setSelectedRole] = useState<USERCATEGORY>("CUSTOMER");
   const [disabled, setDisabled] = useState(true);
+
+  const supabase = createClientComponentClient<Database>();
 
   const renderContent = (signinContent: string, signupContent: string) => {
     return isSignin ? signinContent : signupContent;
@@ -91,6 +94,12 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
   };
 
   const handleGoogleSignIn = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+  };
+
+  const handleGoogleSignUp = async () => {
     localStorage.setItem("selectedRole", selectedRole);
     await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -98,18 +107,21 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
   };
 
   useEffect(() => {
-    setSelectedRole(inputs.role);
-    localStorage.setItem("selectedRole", selectedRole);
-    console.log("selectedRole in useeffect:", selectedRole);
-  }, [selectedRole, inputs]);
+    if (!isSignin) {
+      setSelectedRole(inputs.role);
+      localStorage.setItem("selectedRole", selectedRole);
+    }
+  }, [selectedRole, inputs, isSignin]);
 
   useEffect(() => {
-    const storedRole = localStorage.getItem("selectedRole");
-    if (storedRole) {
-      setSelectedRole(storedRole as USERCATEGORY);
-      localStorage.removeItem("selectedRole"); // Nettoyer après utilisation
+    if (!isSignin) {
+      const storedRole = localStorage.getItem("selectedRole");
+      if (storedRole) {
+        setSelectedRole(storedRole as USERCATEGORY);
+        localStorage.removeItem("selectedRole"); // Nettoyer après utilisation
+      }
     }
-  }, []);
+  }, [isSignin]);
 
   return (
     <div>
@@ -168,9 +180,15 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
                 </button>
               </div>
               <hr className="my-5" />
-              <button onClick={handleGoogleSignIn}>
-                Se connecter avec Google
-              </button>
+              {isSignin ? (
+                <button onClick={handleGoogleSignIn}>
+                  Se connecter avec Google
+                </button>
+              ) : (
+                <button onClick={handleGoogleSignUp}>
+                  Se connecter avec Google
+                </button>
+              )}
             </div>
           )}
         </Box>

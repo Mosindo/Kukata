@@ -2,11 +2,12 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { AuthenticationContext } from "../app/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { supabase } from "../lib/supabase";
 import { USERCATEGORY } from "@prisma/client";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const useAuth = () => {
   const { error, setAuthState } = useContext(AuthenticationContext);
+  const supabase = createClientComponentClient();
   const router = useRouter();
 
   const signin = async (
@@ -39,8 +40,6 @@ const useAuth = () => {
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week from now
         data.session.expires_at = expiresAt.getTime();
         await supabase.auth.setSession(data.session);
-
-        console.log("User details:", data.user);
       }
 
       const response = await axios.post(
@@ -76,7 +75,6 @@ const useAuth = () => {
       lastName,
       city,
       phoneNumber,
-      role,
     }: {
       email: string;
       password: string;
@@ -99,7 +97,6 @@ const useAuth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: "http://localhost:3000/auth/callback",
           data: {
             firstName,
             lastName,
@@ -114,8 +111,6 @@ const useAuth = () => {
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week from now
         data.session.expires_at = expiresAt.getTime();
         await supabase.auth.setSession(data.session);
-
-        console.log("User details:", data.user);
       }
       router.refresh();
       const storedRole = localStorage.getItem("selectedRole") as USERCATEGORY;
@@ -181,7 +176,15 @@ const useAuth = () => {
           session.user.app_metadata.provider === "google"
         ) {
           const { user } = session;
-          console.log("user:", user);
+
+          const storedRole = localStorage.getItem(
+            "selectedRole"
+          ) as USERCATEGORY;
+          const role = storedRole ? storedRole : USERCATEGORY.CUSTOMER;
+          const userExists = await checkUserExists(user.id, role);
+          if (userExists) {
+            return;
+          }
           // Create a profile for the user
           googleSignup(user);
         }
@@ -193,6 +196,19 @@ const useAuth = () => {
     };
   }, [selectedRole]);
 
+  const checkUserExists = async (userId: string, role: USERCATEGORY) => {
+    const { data, error } = await supabase
+      .from(role.toLowerCase())
+      .select("userId")
+      .eq("userId", userId);
+
+    if (error) {
+      console.error("Error fetching user:", error);
+      return false;
+    }
+
+    return data && data.length > 0;
+  };
   // Dans votre hook useAuth
   const googleSignup = async (user: any) => {
     const storedRole = localStorage.getItem("selectedRole") as USERCATEGORY;
@@ -205,14 +221,13 @@ const useAuth = () => {
       role: role,
       phoneNumber: user.phone,
     };
-    console.log("googleSignIn role:", role);
+
     try {
       const response = await axios.post(
         `http://localhost:3000/api/${role.toLowerCase()}`,
         userData
       );
       localStorage.removeItem("selectedRole");
-      console.log("handlegoogleSignin:", response.data);
     } catch (error) {
       console.error("Failed to create user:", error);
     }

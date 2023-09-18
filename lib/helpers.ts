@@ -25,33 +25,33 @@ interface CustomerType {
   userId: string;
 }
 
-export const fetchCustomerByUserId = async (
-  id: string
-): Promise<CustomerType> => {
+export const fetchUserRolesById = async (id: string) => {
   if (!id) {
     throw new Error("No user ID provided");
   }
 
   try {
-    // Fetch all customers
-    const response = await axios.get(`http://localhost:3000/api/customer`);
+    const [costumerResponse, ownerResponse, stylistResponse] =
+      await Promise.all([
+        axios.get(`http://localhost:3000/api/customer/${id}`),
+        axios.get(`http://localhost:3000/api/owner/${id}`),
+        axios.get(`http://localhost:3000/api/stylist/${id}`),
+      ]);
 
-    if (response.status === 200) {
-      const customers: CustomerType[] = response.data;
+    const rolesData = {
+      customer: costumerResponse.data || null,
+      owner: ownerResponse.data || null,
+      stylist: stylistResponse.data || null,
+    };
 
-      // Find the customer with the correct userId
-      const customer = customers.find((customer) => customer.userId === id);
-
-      if (customer) {
-        return customer;
-      }
-
-      throw new Error("No customer found with that ID");
+    // Check if user has any role
+    if (!rolesData.customer && !rolesData.owner && !rolesData.stylist) {
+      throw new Error("User not found");
     }
 
-    throw new Error("Error fetching customers");
+    return rolesData;
   } catch (error) {
-    throw new Error(`Error fetching customer: ${error}`);
+    throw new Error(`Error fetching user roles: ${error}`);
   }
 };
 
