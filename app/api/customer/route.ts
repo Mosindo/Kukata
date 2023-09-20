@@ -68,6 +68,19 @@ export async function POST(req: Request) {
   const data = await req.json();
   const { userId, firstName, lastName, email, phoneNumber, city } = data;
   try {
+    // Vérifier si l'utilisateur existe déjà
+    const existingCustomer = await prisma.customer.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (existingCustomer) {
+      return NextResponse.json("User already exists", {
+        status: 409,
+      });
+    }
+
     const customerData = {
       firstName,
       lastName,

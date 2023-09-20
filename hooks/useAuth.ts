@@ -1,3 +1,5 @@
+"use client";
+
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { AuthenticationContext } from "../app/context/AuthContext";
@@ -158,43 +160,15 @@ const useAuth = () => {
     });
     router.push("/");
   };
-  // Dans votre composant
+
   const [selectedRole, setSelectedRole] = useState<USERCATEGORY>("CUSTOMER");
   const [user, setUser] = useState();
 
-  // Lorsque l'utilisateur sélectionne un rôle dans la modale
   const handleRoleSelection = (role: USERCATEGORY) => {
     setSelectedRole(role);
-    // Fermez la modale si nécessaire
   };
 
-  useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange(
-      async (event: string, session: any) => {
-        if (
-          event === "SIGNED_IN" &&
-          session.user.app_metadata.provider === "google"
-        ) {
-          const { user } = session;
-
-          const storedRole = localStorage.getItem(
-            "selectedRole"
-          ) as USERCATEGORY;
-          const role = storedRole ? storedRole : USERCATEGORY.CUSTOMER;
-          const userExists = await checkUserExists(user.id, role);
-          if (userExists) {
-            return;
-          }
-          // Create a profile for the user
-          googleSignup(user);
-        }
-      }
-    );
-
-    return () => {
-      data.subscription.unsubscribe();
-    };
-  }, [selectedRole]);
+  useEffect(() => {}, [selectedRole]);
 
   const checkUserExists = async (userId: string, role: USERCATEGORY) => {
     const { data, error } = await supabase
@@ -209,25 +183,43 @@ const useAuth = () => {
 
     return data && data.length > 0;
   };
-  // Dans votre hook useAuth
-  const googleSignup = async (user: any) => {
-    const storedRole = localStorage.getItem("selectedRole") as USERCATEGORY;
-    const role = storedRole ? storedRole : USERCATEGORY.CUSTOMER;
-    const userData = {
-      userId: user.id,
-      email: user.email,
-      firstName: user.user_metadata.name,
-      lastName: "",
-      role: role,
-      phoneNumber: user.phone,
-    };
 
+  const googleSignup = async () => {
     try {
-      const response = await axios.post(
-        `http://localhost:3000/api/${role.toLowerCase()}`,
-        userData
+      const { data } = supabase.auth.onAuthStateChange(
+        async (event: string, session: any) => {
+          if (
+            event === "SIGNED_IN" &&
+            session.user.app_metadata.provider === "google"
+          ) {
+            const { user } = session;
+
+            const storedRole = localStorage.getItem(
+              "selectedRole"
+            ) as USERCATEGORY;
+            const role = storedRole ? storedRole : USERCATEGORY.CUSTOMER;
+            const userData = {
+              userId: user.id,
+              email: user.email,
+              firstName: user.user_metadata.name,
+              lastName: "",
+              role: role,
+              phoneNumber: user.phone,
+            };
+
+            const response = await axios.post(
+              `http://localhost:3000/api/${role.toLowerCase()}`,
+              userData
+            );
+            localStorage.removeItem("selectedRole");
+            router.push("/");
+          }
+        }
       );
-      localStorage.removeItem("selectedRole");
+
+      return () => {
+        data.subscription.unsubscribe();
+      };
     } catch (error) {
       console.error("Failed to create user:", error);
     }
@@ -241,6 +233,7 @@ const useAuth = () => {
     handleRoleSelection,
     user,
     setSelectedRole,
+    googleSignup,
   };
 };
 

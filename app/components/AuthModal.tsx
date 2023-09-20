@@ -99,10 +99,15 @@ const AuthModal = ({ isSignin }: { isSignin: boolean }) => {
     });
   };
 
-  const handleGoogleSignUp = async () => {
+  const handleGoogleSignUp = async (e: any) => {
+    e.preventDefault();
+
     localStorage.setItem("selectedRole", selectedRole);
     await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: "http://localhost:3000/success",
+      },
     });
   };
 

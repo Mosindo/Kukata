@@ -1,10 +1,11 @@
 import Header from "../components/Header";
+import SuccessContent from "./components/SuccessContent";
 
 const success = () => {
   return (
     <div>
       <Header />
-      <h1>Success</h1>
+      <SuccessContent />
     </div>
   );
 };
