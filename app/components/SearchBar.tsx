@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { BiSearch } from "react-icons/bi";
 
 const SearchBar = () => {
   const router = useRouter();
@@ -10,7 +11,7 @@ const SearchBar = () => {
   return (
     <div className="text-left text-lg py-3 m-auto flex justify-center">
       <input
-        className="rounded  mr-3 p-2 w-[450px]"
+        className="rounded-full  mr-3 p-2 w-96"
         type="text"
         placeholder="State, city, zip code or salon name"
         value={searchTerm}
@@ -19,14 +20,14 @@ const SearchBar = () => {
         }}
       />
       <button
-        className="rounded bg-red-600 px-9 py-2 text-white"
+        className="rounded-full bg-orange-600  text-white  "
         onClick={() => {
           if (searchTerm === "") return;
           router.push(`/search?searchTerm=${searchTerm}`);
           setSearchTerm("");
         }}
       >
-        Let&apos;s go
+        <BiSearch size={48} />
       </button>
     </div>
   );

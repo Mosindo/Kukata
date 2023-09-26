@@ -54,8 +54,6 @@ const Navbar = () => {
     }
   }, [user]);
 
-  console.log(media);
-
   return (
     <nav className="bg-white p-2 flex justify-between">
       <Link

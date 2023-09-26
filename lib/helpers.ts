@@ -49,7 +49,12 @@ export const fetchUserRolesById = async (id: string) => {
       throw new Error("User not found");
     }
 
-    return rolesData;
+    // Filter out roles with null values
+    const filteredRolesData = Object.fromEntries(
+      Object.entries(rolesData).filter(([_, value]) => value !== null)
+    );
+
+    return filteredRolesData;
   } catch (error) {
     throw new Error(`Error fetching user roles: ${error}`);
   }
