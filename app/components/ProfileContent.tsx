@@ -6,6 +6,7 @@ import Image from "next/image";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../lib/database.types";
 import { fetchUserRolesById } from "../../lib/helpers";
+import { useRouter } from "next/navigation";
 
 export const ProfileContent = () => {
   const [user, setUser] = useState<any>(null);
@@ -14,24 +15,30 @@ export const ProfileContent = () => {
   const [images, setImages] = useState<any>([]);
 
   const { error, data, loading } = useContext(AuthenticationContext);
+  const router = useRouter();
 
-  const supabase = createClientComponentClient<Database>();
-  const CDNURL =
-    "https://ufczslyhktxdabgthvbi.supabase.co/storage/v1/object/public/avatars/";
-
-  const PHOTO_GALLERY_PATH =
-    "https://ufczslyhktxdabgthvbi.supabase.co/storage/v1/object/public/images/";
+  // const supabase = createClientComponentClient<Database>();
 
   const photo = {
     IMAGES: "images",
     AVATARS: "avatars",
   };
+
+  const supabase = createClientComponentClient<Database>();
+
   useEffect(() => {
     async function getUser() {
       try {
         if (data?.id) {
           const profile = await fetchUserRolesById(data?.id);
-          setRole(profile.owner.role);
+
+          if (profile.owner?.role === "OWNER") {
+            setRole(profile.owner.role);
+          }
+          if (profile.customer.role === "CUSTOMER") {
+            setRole(profile.customer?.role);
+          }
+
           setUser(data);
         }
       } catch (error) {
@@ -49,7 +56,7 @@ export const ProfileContent = () => {
 
     const { data, error } = await supabase.storage
       .from(bucketName)
-      .upload(user.id + "/" + uuidv4(), file);
+      .upload(user?.id + "/" + uuidv4(), file);
 
     if (data) {
       getImages(bucketName);
@@ -67,12 +74,15 @@ export const ProfileContent = () => {
         sortBy: { column: "name", order: "asc" },
       });
 
-    if (data !== null && bucketName === "avatars") {
-      setMedia(data);
-    } else if (data !== null && bucketName === "images") {
-      setImages(data);
+    if (data !== null) {
+      if (bucketName === "avatars") {
+        setMedia(data);
+      }
+
+      if (bucketName === "images") {
+        setImages(data);
+      }
     } else {
-      alert("Error loading images");
       console.log(error);
     }
   }
@@ -87,7 +97,7 @@ export const ProfileContent = () => {
   async function deleteImage(imageName: string, bucketName: string) {
     const { error } = await supabase.storage
       .from(bucketName)
-      .remove([user.id + "/" + imageName]);
+      .remove([user?.id + "/" + imageName]);
 
     if (error) {
       alert(error);
@@ -97,7 +107,7 @@ export const ProfileContent = () => {
   }
 
   async function deleteAllImages(bucketName: string) {
-    const { error } = await supabase.storage.from("avatars").remove([user.id]);
+    const { error } = await supabase.storage.from("avatars").remove([user?.id]);
 
     if (error) {
       alert(error);
@@ -106,25 +116,24 @@ export const ProfileContent = () => {
     }
   }
 
-  async function updateImage(
-    imageName: string,
-    newImageName: string,
-    bucketName: string
-  ) {
-    const { error } = await supabase.storage
+  async function updateImage(e: any, imageName: string, bucketName: string) {
+    let newImageName = e.target.files[0];
+    console.log("newImageName", newImageName);
+    const { error, data } = await supabase.storage
       .from(bucketName)
-      .update(user.id + "/" + imageName, newImageName, {
-        cacheControl: "3600",
+      .update(user?.id + "/" + imageName, newImageName, {
         upsert: true,
       });
-
-    if (error) {
-      alert(error);
-    } else {
+    console.log("updateImage:", data);
+    if (data) {
       getImages(bucketName);
+      console.log("finished uploading");
+      router.refresh();
+    } else {
+      console.log(error);
     }
   }
-  console.log("userProfile", role, "user:", user);
+
   return (
     <div>
       <h1>ProfileContent</h1>
@@ -139,41 +148,64 @@ export const ProfileContent = () => {
           <p>{user?.city}</p>
           <p>{user?.role}</p>
           <hr />
-          <p>upload new profile picture</p>
-          <input type="file" onChange={(e) => uploadImage(e, "avatars")} />
+          {media.length < 0 && (
+            <>
+              <p>upload new profile picture</p>
+              <input
+                type="file"
+                onChange={(e) => uploadImage(e, photo.AVATARS)}
+              />
+            </>
+          )}
 
           {media.length > 0 && (
-            <Image
-              src={CDNURL + user?.id + "/" + media[0].name}
-              width={100}
-              height={100}
-              alt="Picture of the author"
-              className="rounded-full m-10"
-            />
+            <>
+              <div className="w-12 rounded-full overflow-hidden  h-12">
+                {" "}
+                <Image
+                  src={process.env.CDNURL + user?.id + "/" + media[0].name}
+                  width={100}
+                  height={100}
+                  alt="Picture of the author"
+                  priority={true}
+                />
+              </div>
+
+              <p>update</p>
+              <input
+                type="file"
+                onChange={(e) => updateImage(e, media[0].name, photo.AVATARS)}
+              />
+            </>
           )}
         </>
       )}
 
-      <p>upload new images</p>
-      <input type="file" onChange={(e) => uploadImage(e, "images")} />
-      <div className="grid grid-cols-4 gap-4  mt-4">
-        {role &&
-          images.length > 0 &&
-          images.map((image: any) => (
-            <div className="rounded-lg   " key={image.id}>
-              <Image
-                src={PHOTO_GALLERY_PATH + user?.id + "/" + image.name}
-                width={100}
-                height={100}
-                alt="Picture of the author"
-                className=" h-48 w-48 rounded-lg"
-              />
+      <div className="grid grid-cols-4 gap-0.5 mt-4">
+        {role && images.length > 0 && (
+          <>
+            <p>upload new images</p>
+            <input type="file" onChange={(e) => uploadImage(e, "images")} />
+            {images.map((image: any) => (
+              <div className="rounded-lg   " key={image?.id}>
+                <Image
+                  src={
+                    process.env.PHOTO_GALLERY_PATH + user?.id + "/" + image.name
+                  }
+                  width={100}
+                  height={100}
+                  alt="Picture of the author"
+                  className=" h-48 w-48 rounded-lg"
+                  priority={true}
+                />
 
-              <button className="text-sm font-medium uppercase tracking-widest text-dark ">
-                Buy
-              </button>
-            </div>
-          ))}
+                <button className="text-sm font-medium uppercase tracking-widest text-dark ">
+                  Buy
+                </button>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

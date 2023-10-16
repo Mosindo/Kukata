@@ -8,8 +8,8 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import { AuthenticationContext } from "../context/AuthContext";
 import useAuth from "../../hooks/useAuth";
 import { Button, IconButton, Menu, MenuItem } from "@mui/material";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../lib/database.types";
+import { supabase } from "../../lib/supabase";
 
 const Navbar = () => {
   const { data: user, loading } = useContext(AuthenticationContext);
@@ -19,8 +19,6 @@ const Navbar = () => {
   const [media, setMedia] = React.useState<any>([]);
 
   const open = Boolean(anchorEl);
-  const CDNURL =
-    "https://ufczslyhktxdabgthvbi.supabase.co/storage/v1/object/public/avatars/";
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -29,7 +27,6 @@ const Navbar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const supabase = createClientComponentClient<Database>();
 
   const getImages = async () => {
     const { data, error } = await supabase.storage
@@ -69,16 +66,21 @@ const Navbar = () => {
               {user ? (
                 <>
                   {media && media.length > 0 ? (
-                    <div
-                      className="w-12 rounded-full overflow-hidden  h-12"
-                      onClick={handleMenu}
-                    >
-                      <Image
-                        src={CDNURL + user?.id + "/" + media[0].name}
-                        alt="Picture of the author"
-                        width={500}
-                        height={500}
-                      />
+                    <div>
+                      <div
+                        className="w-12 rounded-full overflow-hidden  h-12"
+                        onClick={handleMenu}
+                      >
+                        <Image
+                          src={
+                            process.env.CDNURL + user?.id + "/" + media[0].name
+                          }
+                          alt="Picture of the author"
+                          priority={true}
+                          width={50}
+                          height={50}
+                        />
+                      </div>
                     </div>
                   ) : (
                     <IconButton
