@@ -7,24 +7,27 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../lib/database.types";
 import { fetchUserRolesById } from "../../lib/helpers";
 import { useRouter } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export const ProfileContent = () => {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<any>(null);
   const [media, setMedia] = useState<any>([]);
   const [images, setImages] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { error, data, loading } = useContext(AuthenticationContext);
+  const { error, data } = useContext(AuthenticationContext);
   const router = useRouter();
 
-  // const supabase = createClientComponentClient<Database>();
-
+  const supabase = createClientComponentClient<Database>();
+  const CDNURL =
+    "https://ufczslyhktxdabgthvbi.supabase.co/storage/v1/object/public/avatars/";
+  const GALLERY_PATH =
+    "https://ufczslyhktxdabgthvbi.supabase.co/storage/v1/object/public/images/";
   const photo = {
     IMAGES: "images",
     AVATARS: "avatars",
   };
-
-  const supabase = createClientComponentClient<Database>();
 
   useEffect(() => {
     async function getUser() {
@@ -60,6 +63,7 @@ export const ProfileContent = () => {
 
     if (data) {
       getImages(bucketName);
+      router.refresh();
     } else {
       console.log(error);
     }
@@ -82,17 +86,17 @@ export const ProfileContent = () => {
       if (bucketName === "images") {
         setImages(data);
       }
+
+      setLoading(false);
     } else {
       console.log(error);
     }
   }
 
   useEffect(() => {
-    if (user) {
-      getImages(photo.AVATARS);
-      getImages(photo.IMAGES);
-    }
-  }, [user]);
+    getImages(photo.AVATARS);
+    getImages(photo.IMAGES);
+  }, [user, loading]);
 
   async function deleteImage(imageName: string, bucketName: string) {
     const { error } = await supabase.storage
@@ -128,7 +132,7 @@ export const ProfileContent = () => {
     if (data) {
       getImages(bucketName);
       console.log("finished uploading");
-      router.refresh();
+      await router.refresh();
     } else {
       console.log(error);
     }
@@ -163,11 +167,11 @@ export const ProfileContent = () => {
               <div className="w-12 rounded-full overflow-hidden  h-12">
                 {" "}
                 <Image
-                  src={process.env.CDNURL + user?.id + "/" + media[0].name}
+                  src={CDNURL + user?.id + "/" + media[0].name}
                   width={100}
                   height={100}
                   alt="Picture of the author"
-                  priority={true}
+                  priority
                 />
               </div>
 
@@ -187,22 +191,20 @@ export const ProfileContent = () => {
             <p>upload new images</p>
             <input type="file" onChange={(e) => uploadImage(e, "images")} />
             {images.map((image: any) => (
-              <div className="rounded-lg   " key={image?.id}>
+              <pre className="rounded-lg   " key={image?.id}>
                 <Image
-                  src={
-                    process.env.PHOTO_GALLERY_PATH + user?.id + "/" + image.name
-                  }
+                  src={GALLERY_PATH + user?.id + "/" + image.name}
                   width={100}
                   height={100}
                   alt="Picture of the author"
                   className=" h-48 w-48 rounded-lg"
-                  priority={true}
+                  priority
                 />
 
                 <button className="text-sm font-medium uppercase tracking-widest text-dark ">
                   Buy
                 </button>
-              </div>
+              </pre>
             ))}
           </>
         )}
