@@ -1,16 +1,25 @@
-/** @type {import('next').NextConfig} */
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-    serverActions: true,
-  },
   reactStrictMode: true,
   images: {
-    domains: ["images.unsplash.com", "ufczslyhktxdabgthvbi.supabase.co"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "ufczslyhktxdabgthvbi.supabase.co",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "**",
+      },
+    ],
   },
   env: {
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+    SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   },
 };
 

@@ -1,7 +1,6 @@
 "use client";
-
 import Link from "next/link";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import AuthModal from "./AuthModal";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -9,16 +8,20 @@ import { AuthenticationContext } from "../context/AuthContext";
 import useAuth from "../../hooks/useAuth";
 import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 import { Database } from "../../lib/database.types";
-import { supabase } from "../../lib/supabase";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const Navbar = () => {
-  const { data: user, loading } = useContext(AuthenticationContext);
+  const { data: user, loading, error } = useContext(AuthenticationContext);
   const { signout } = useAuth();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [media, setMedia] = React.useState<any>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const open = Boolean(anchorEl);
+  const supabase = createClientComponentClient<Database>();
+  const CDNURL =
+    "https://ufczslyhktxdabgthvbi.supabase.co/storage/v1/object/public/avatars/";
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -37,19 +40,24 @@ const Navbar = () => {
         sortBy: { column: "name", order: "asc" },
       });
 
-    if (data !== null) {
+    if (data) {
       setMedia(data);
+      setIsLoading(false);
     } else {
-      alert("Error loading images");
       console.log(error);
+      setIsLoading(false);
     }
+    console.log("data", data);
   };
 
   useEffect(() => {
-    if (user) {
-      getImages();
-    }
-  }, [user]);
+    getImages();
+  }, [user, loading]);
+
+  //solution to fix cache issu
+  const imageUrl = `${
+    CDNURL + user?.id + "/" + media[0]?.name
+  }?t=${new Date().getTime()}`;
 
   return (
     <nav className="bg-white p-2 flex justify-between">
@@ -61,27 +69,27 @@ const Navbar = () => {
       </Link>
       <div>
         <div className="flex">
-          {loading ? null : (
+          {isLoading ? null : (
             <div className="flex">
               {user ? (
                 <>
-                  {media && media.length > 0 ? (
-                    <div>
+                  {media.length > 0 ? (
+                    <pre>
                       <div
                         className="w-12 rounded-full overflow-hidden  h-12"
                         onClick={handleMenu}
                       >
                         <Image
-                          src={
-                            process.env.CDNURL + user?.id + "/" + media[0].name
-                          }
-                          alt="Picture of the author"
-                          priority={true}
+                          src={imageUrl}
+                          alt="avatar"
                           width={50}
                           height={50}
+                          placeholder="blur"
+                          blurDataURL={imageUrl}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
                       </div>
-                    </div>
+                    </pre>
                   ) : (
                     <IconButton
                       size="large"

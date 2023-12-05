@@ -10,13 +10,23 @@ export const supabase = createClient<Database>(
   SUPABASE_ANON_KEY,
   {
     auth: {
-      // autoRefreshToken: true,
+      autoRefreshToken: false,
       persistSession: false,
-      // detectSessionInUrl: true,
+      detectSessionInUrl: false,
     },
   }
 );
 
-const admin = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+const admin = createClient<Database>(
+  SUPABASE_URL as string,
+  SUPABASE_SERVICE_KEY as string,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+  }
+);
 
 export const supabaseAdmin = admin;

@@ -7,7 +7,6 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../lib/database.types";
 import { fetchUserRolesById } from "../../lib/helpers";
 import { useRouter } from "next/navigation";
-import { revalidatePath } from "next/cache";
 
 export const ProfileContent = () => {
   const [user, setUser] = useState<any>(null);
@@ -34,11 +33,11 @@ export const ProfileContent = () => {
       try {
         if (data?.id) {
           const profile = await fetchUserRolesById(data?.id);
-
+          console.log("profil:", profile);
           if (profile.owner?.role === "OWNER") {
             setRole(profile.owner.role);
           }
-          if (profile.customer.role === "CUSTOMER") {
+          if (profile.customer?.role === "CUSTOMER") {
             setRole(profile.customer?.role);
           }
 
@@ -57,15 +56,18 @@ export const ProfileContent = () => {
   async function uploadImage(e: any, bucketName: string) {
     let file = e.target.files[0];
 
-    const { data, error } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from(bucketName)
       .upload(user?.id + "/" + uuidv4(), file);
 
-    if (data) {
-      getImages(bucketName);
+    if (!uploadError) {
+      console.log("Image Uploaded, Updating Media State...");
+
+      await getImages(bucketName);
+
       router.refresh();
     } else {
-      console.log(error);
+      console.error("Upload Error:", uploadError);
     }
   }
 
@@ -80,7 +82,7 @@ export const ProfileContent = () => {
 
     if (data !== null) {
       if (bucketName === "avatars") {
-        setMedia(data);
+        setMedia([...data]);
       }
 
       if (bucketName === "images") {
@@ -137,6 +139,9 @@ export const ProfileContent = () => {
       console.log(error);
     }
   }
+  const imageUrl = `${
+    CDNURL + user?.id + "/" + media[0]?.name
+  }?t=${new Date().getTime()}`;
 
   return (
     <div>
@@ -167,11 +172,13 @@ export const ProfileContent = () => {
               <div className="w-12 rounded-full overflow-hidden  h-12">
                 {" "}
                 <Image
-                  src={CDNURL + user?.id + "/" + media[0].name}
+                  src={imageUrl}
                   width={100}
                   height={100}
-                  alt="Picture of the author"
+                  placeholder="blur"
+                  blurDataURL={imageUrl}
                   priority
+                  alt="avatar"
                 />
               </div>
 
@@ -193,7 +200,9 @@ export const ProfileContent = () => {
             {images.map((image: any) => (
               <pre className="rounded-lg   " key={image?.id}>
                 <Image
-                  src={GALLERY_PATH + user?.id + "/" + image.name}
+                  src={`${
+                    GALLERY_PATH + user?.id + "/" + image.name
+                  }?t=${new Date().getTime()}`}
                   width={100}
                   height={100}
                   alt="Picture of the author"
