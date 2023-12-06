@@ -1,5 +1,11 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AuthenticationContext } from "../context/AuthContext";
 import { v4 as uuidv4 } from "uuid";
 import Image from "next/image";
@@ -7,15 +13,38 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../lib/database.types";
 import { fetchUserRolesById } from "../../lib/helpers";
 import { useRouter } from "next/navigation";
+import Gallery from "./Gallery";
+
+interface User {
+  id: string;
+  email: string;
+  lastName: string;
+  firstName: string;
+  phoneNumber: string;
+  city: string;
+  role: string;
+}
+
+type Role = "OWNER" | "CUSTOMER";
+interface Media {
+  name: string;
+}
 
 export const ProfileContent = () => {
-  const [user, setUser] = useState<any>(null);
-  const [role, setRole] = useState<any>(null);
-  const [media, setMedia] = useState<any>([]);
-  const [images, setImages] = useState<any>([]);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<Role | null>(null);
+  const [media, setMedia] = useState<Media[]>([]);
+  const [images, setImages] = useState<Media[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const { error, data } = useContext(AuthenticationContext);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const updateFileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    error,
+    data,
+    loading: userLoading,
+  } = useContext(AuthenticationContext);
   const router = useRouter();
 
   const supabase = createClientComponentClient<Database>();
@@ -53,21 +82,28 @@ export const ProfileContent = () => {
     }
   }, [data, error, loading]);
 
-  async function uploadImage(e: any, bucketName: string) {
-    let file = e.target.files[0];
+  async function uploadImage(
+    e: ChangeEvent<HTMLInputElement>,
+    bucketName: string
+  ) {
+    let file = e.target.files?.[0];
+    if (file instanceof File) {
+      const { error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(user?.id + "/" + uuidv4(), file);
 
-    const { error: uploadError } = await supabase.storage
-      .from(bucketName)
-      .upload(user?.id + "/" + uuidv4(), file);
+      if (!uploadError) {
+        console.log("Image Uploaded, Updating Media State...");
 
-    if (!uploadError) {
-      console.log("Image Uploaded, Updating Media State...");
+        await getImages(bucketName);
 
-      await getImages(bucketName);
-
-      router.refresh();
-    } else {
-      console.error("Upload Error:", uploadError);
+        router.refresh();
+      } else {
+        console.error("Upload Error:", uploadError);
+      }
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   }
 
@@ -95,10 +131,16 @@ export const ProfileContent = () => {
     }
   }
 
+  async function loadAllImages() {
+    await getImages(photo.AVATARS);
+    await getImages(photo.IMAGES);
+  }
+
   useEffect(() => {
-    getImages(photo.AVATARS);
-    getImages(photo.IMAGES);
-  }, [user, loading]);
+    if (user && !userLoading) {
+      loadAllImages();
+    }
+  }, [user, userLoading]);
 
   async function deleteImage(imageName: string, bucketName: string) {
     const { error } = await supabase.storage
@@ -122,23 +164,33 @@ export const ProfileContent = () => {
     }
   }
 
-  async function updateImage(e: any, imageName: string, bucketName: string) {
-    let newImageName = e.target.files[0];
-    console.log("newImageName", newImageName);
-    const { error, data } = await supabase.storage
-      .from(bucketName)
-      .update(user?.id + "/" + imageName, newImageName, {
-        upsert: true,
-      });
-    console.log("updateImage:", data);
-    if (data) {
-      getImages(bucketName);
-      console.log("finished uploading");
-      await router.refresh();
-    } else {
-      console.log(error);
+  async function updateImage(
+    e: ChangeEvent<HTMLInputElement>,
+    imageName: string,
+    bucketName: string
+  ) {
+    let newImageName = e.target.files?.[0];
+    if (newImageName instanceof File) {
+      const { error, data } = await supabase.storage
+        .from(bucketName)
+        .update(user?.id + "/" + imageName, newImageName, {
+          upsert: true,
+        });
+      console.log("updateImage:", data);
+      if (data) {
+        getImages(bucketName);
+        console.log("finished uploading");
+        await router.refresh();
+      } else {
+        console.log(error);
+      }
+    }
+
+    if (updateFileInputRef.current) {
+      updateFileInputRef.current.value = "";
     }
   }
+
   const imageUrl = `${
     CDNURL + user?.id + "/" + media[0]?.name
   }?t=${new Date().getTime()}`;
@@ -157,7 +209,7 @@ export const ProfileContent = () => {
           <p>{user?.city}</p>
           <p>{user?.role}</p>
           <hr />
-          {media.length < 0 && (
+          {media.length === 0 && (
             <>
               <p>upload new profile picture</p>
               <input
@@ -183,38 +235,29 @@ export const ProfileContent = () => {
               </div>
 
               <p>update</p>
+
               <input
                 type="file"
+                className="file-input file-input-bordered w-full max-w-xs"
                 onChange={(e) => updateImage(e, media[0].name, photo.AVATARS)}
+                ref={updateFileInputRef}
               />
             </>
           )}
         </>
       )}
 
-      <div className="grid grid-cols-4 gap-0.5 mt-4">
+      <div className="">
         {role && images.length > 0 && (
           <>
             <p>upload new images</p>
-            <input type="file" onChange={(e) => uploadImage(e, "images")} />
-            {images.map((image: any) => (
-              <pre className="rounded-lg   " key={image?.id}>
-                <Image
-                  src={`${
-                    GALLERY_PATH + user?.id + "/" + image.name
-                  }?t=${new Date().getTime()}`}
-                  width={100}
-                  height={100}
-                  alt="Picture of the author"
-                  className=" h-48 w-48 rounded-lg"
-                  priority
-                />
-
-                <button className="text-sm font-medium uppercase tracking-widest text-dark ">
-                  Buy
-                </button>
-              </pre>
-            ))}
+            <input
+              type="file"
+              className="file-input file-input-bordered w-full max-w-xs"
+              onChange={(e) => uploadImage(e, photo.IMAGES)}
+              ref={fileInputRef}
+            />
+            <Gallery images={images} userId={user?.id} path={GALLERY_PATH} />
           </>
         )}
       </div>
